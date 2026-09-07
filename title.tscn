@@ -1,11 +1,17 @@
 [gd_scene format=3 uid="uid://diig3jjcb3ca4"]
 
+[ext_resource type="Script" uid="uid://c5baw2ugmp1g8" path="res://title.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="1_y7k74"]
+[ext_resource type="Texture2D" uid="uid://c2rbg1otrvxt4" path="res://Image/rogo.png" id="3_kpexm"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_oyqm6"]
-font = ExtResource("1_y7k74")
-font_size = 100
-font_color = Color(0, 0, 0, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+bg_color = Color(0.0941176, 0.356863, 0.47451, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.0705882, 0.27451, 0.368627, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.12549, 0.435294, 0.572549, 1)
 
 [node name="Title" type="Control" unique_id=982053829]
 layout_mode = 3
@@ -14,26 +20,75 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_script")
 
 [node name="Background" type="ColorRect" parent="." unique_id=555753779]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 6.0
-offset_right = 1152.0
-offset_bottom = 650.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Label" type="Label" parent="." unique_id=1745236023]
+[node name="Rogo" type="Sprite2D" parent="." unique_id=112087360]
+position = Vector2(960, 212)
+texture = ExtResource("3_kpexm")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1016666254]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -257.0
-offset_top = -236.0
-offset_right = 639.0
-offset_bottom = -99.0
+offset_left = -450.0
+offset_top = -100.0
+offset_right = 450.0
+offset_bottom = 460.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "つめつめ"
-label_settings = SubResource("LabelSettings_oyqm6")
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="Spacer" type="Control" parent="VBoxContainer" unique_id=619266236]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="VBoxContainer" unique_id=2049182900]
+custom_minimum_size = Vector2(900, 130)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 52
+theme_override_styles/normal = SubResource("StyleBoxFlat_box")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "スタート"
+
+[node name="RecordButton" type="Button" parent="VBoxContainer" unique_id=486729601]
+custom_minimum_size = Vector2(900, 130)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 52
+theme_override_styles/normal = SubResource("StyleBoxFlat_box")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "記録"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=1127965592]
+custom_minimum_size = Vector2(900, 130)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 52
+theme_override_styles/normal = SubResource("StyleBoxFlat_box")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "終了"
