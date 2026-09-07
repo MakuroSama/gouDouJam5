@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cf6dywaya67uy"]
+
+[ext_resource type="Texture2D" uid="uid://cwda765lkbagh" path="res://Image/sports.png" id="1_msue7"]
+
+[node name="Sports" type="StaticBody2D" unique_id=1962389092]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1403557231]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_msue7")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=773515066]
+scale = Vector2(0.2, 0.2)
+polygon = PackedVector2Array(25.5, -226, -28.5, -226, -28.5, -224.5, -29.8, -224, -32.5, -224, -37.5, -217, -39.5, -217, -39.5, -174, -35.5, -171, -35.5, -165.7, -77.6, -98, -78.9, -98, -81.5, -90.2, -81.5, 41.600006, -79.3, 45, -81.5, 49.399994, -81.5, 209.4, -73.5, 220.6, -73.5, 222.29999, -63.3, 227, 61.399994, 227, 65.899994, 225, 68.399994, 225, 75.399994, 217, 77, 217, 80, 207, 81.5, 207, 81.5, 54.399994, 76.600006, 47, 76.5, 43.700012, 81.5, 37.700012, 81.5, -86.5, 33.1, -168.1, 35.800003, -174, 37.6, -174, 36.5, -215.1, 36.5, -218.2, 25.5, -224.3)

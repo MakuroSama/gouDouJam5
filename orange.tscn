@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cssr0fg55gr3x"]
+
+[ext_resource type="Texture2D" uid="uid://blxyi1s00iicf" path="res://Image/orange.png" id="1_vnrxy"]
+
+[node name="Orange" type="StaticBody2D" unique_id=24999337]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=788492009]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_vnrxy")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=440302438]
+scale = Vector2(0.2, 0.2)
+polygon = PackedVector2Array(29.5, -226, -24.5, -226, -24.5, -224.5, -25.8, -224, -28.5, -224, -33.5, -217, -35.4, -217, -36.5, -184, -36.5, -181, -35.5, -181, -35.5, -174, -31.5, -171, -31.5, -165.7, -73.6, -98, -74.9, -98, -77.9, -89, -79.5, -89, -79.5, 38.600006, -75.3, 45, -79.5, 53.5, -79.5, 206.6, -69.5, 220.6, -69.5, 222.4, -56.7, 227, 65.399994, 227, 69.899994, 225, 72.5, 225, 80.5, 215, 80.5, -96.899994, 36.6, -168, 36.5, -171.2, 39.300003, -174, 41.6, -174, 39.5, -216.1, 39.5, -219.2, 29.5, -224.3)

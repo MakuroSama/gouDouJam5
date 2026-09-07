@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dfggn7owtolmf"]
+
+[ext_resource type="Texture2D" uid="uid://hk3ceep62oe7" path="res://Image/potato.png" id="1_5wy20"]
+
+[node name="Potato" type="StaticBody2D" unique_id=1187822617]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1116991141]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_5wy20")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=198294074]
+scale = Vector2(0.2, 0.2)
+polygon = PackedVector2Array(30.5, -75.7, 10.800003, -79, 8.5, -79, 8.5, -77.8, -7.800003, -75, -11.099998, -75, -25.099998, -66, -27.400002, -66, -34.4, -58, -35.7, -58, -47.5, -36.5, -47.5, -34.8, -71.3, -11, -72.9, -11, -78.9, 7, -80.8, 7, -78.5, 25.199997, -78.5, 29.400002, -71.5, 44.300003, -71.5, 46.699997, -60.5, 59.699997, -60.5, 61.100006, -47.5, 69, -47.5, 70.600006, -15.699997, 77, 2.9000015, 77, 20.900002, 70, 23.199997, 70, 35.199997, 60, 37.4, 60, 50.399994, 45, 51.699997, 45, 66.7, 17, 68, 17, 72, 2, 73.5, 2, 73.5, -26.400002, 66.5, -41.4, 66.5, -43.9, 43.5, -65.9, 43.5, -67.2, 30.5, -74.3)
