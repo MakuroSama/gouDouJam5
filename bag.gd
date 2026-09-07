@@ -2,7 +2,6 @@
 extends Node2D
 class_name Chain
 
-
 # ============================================================
 # BAG
 # ============================================================
@@ -21,7 +20,6 @@ var points: int = 16
 # Collision circles overlap by this amount.
 @export_range(1.0, 2.0, 0.05)
 var collision_overlap: float = 1.5
-
 
 # ============================================================
 # PHYSICS
@@ -54,7 +52,6 @@ var maximum_stretch: float = 1.08
 # Mass of each bag link.
 @export var link_mass: float = 0.05
 
-
 # ============================================================
 # HOOKS
 # ============================================================
@@ -63,7 +60,6 @@ var maximum_stretch: float = 1.08
 
 @export var hook_path: NodePath
 @export var hook2_path: NodePath
-
 
 # ============================================================
 # BREAKING
@@ -74,7 +70,6 @@ var maximum_stretch: float = 1.08
 # Set to 0 to effectively disable breaking.
 @export var break_threshold: float = 70.0
 
-
 # ============================================================
 # RENDERING
 # ============================================================
@@ -84,7 +79,8 @@ var maximum_stretch: float = 1.08
 @export var draw_bag: bool = true
 @export var bag_line_width: float = 2
 @export var smooth_subdivisions: int = 40
-@export var bag_color: Color = Color(0.15, 0.55, 1.0)
+@export var bag_color: Color = Color(0.0, 1.0, 0.0, 1.0)
+@export var bag_break_color: Color = Color(1.0, 0.0, 0.0, 1.0)
 
 
 # ============================================================
@@ -583,7 +579,7 @@ func _draw() -> void:
 		draw_line(
 			smooth_points[i],
 			smooth_points[i + 1],
-			bag_color,
+			lerp(bag_color,bag_break_color,(smooth_points[i].distance_to(smooth_points[i+1])*smooth_subdivisions)/break_threshold),
 			bag_line_width,
 			true
 		)
