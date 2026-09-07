@@ -5,9 +5,9 @@
 [node name="Negi" type="RigidBody2D" unique_id=1549638287]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=581218613]
-scale = Vector2(0.2, 0.2)
+scale = Vector2(0.4, 0.4)
 texture = ExtResource("1_mmwpd")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1872025292]
-scale = Vector2(0.2, 0.2)
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="." unique_id=1975541408]
+scale = Vector2(0.4, 0.4)
 polygon = PackedVector2Array(45.5, -97.2, 45.5, -94.8, 39.600006, -88, 38.199997, -88, 8.5, -23.400002, 8.5, -22, -53.5, 25, -53.5, 25.899994, -108.2, 63, -110.5, 63, -115.5, 70, -117.9, 70, -115.5, 84.3, -115.5, 87.100006, -105.1, 94, -92.9, 94, -51.800003, 66, -49.800003, 66, 31.5, 2, 31.5, 1.4000015, 69.600006, -9, 73.899994, -9, 107.8, -23, 110.5, -23, 110.5, -35.4, 103.399994, -53.6, 105.5, -56.3, 105.5, -61.6, 98.5, -71.6, 98.5, -73.9, 92.5, -79, 92.5, -81, 88.5, -81, 88.5, -83, 76.5, -78.2, 76.5, -84.1, 73.5, -86.1, 73.5, -87.2, 59.5, -94.3, 59.5, -95.8)
