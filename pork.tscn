@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cm1ofogty31su"]
+
+[ext_resource type="Texture2D" uid="uid://qjokjnn5t8ma" path="res://Image/pork.png" id="1_28bec"]
+
+[node name="Pork" type="StaticBody2D" unique_id=709893473]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1336504947]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_28bec")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1970385149]
+scale = Vector2(0.2, 0.2)
+polygon = PackedVector2Array(174.5, -95.4, 162.5, -106.5, 162.5, -108.5, -157.5, -108.5, -169, -100.5, -170.8, -100.5, -175.8, -88.5, -177.3, -88.5, -191.5, 40.199997, -191.5, 83.100006, -189.5, 86.100006, -189.5, 88.5, -179.5, 96.399994, -179.5, 97.899994, -152.9, 108.5, 155, 108.5, 178, 97.5, 180.5, 97.5, 191.5, 83.5, 191.5, 30.600006, 180.5, -61.7, 180.5, -73.8, 174.5, -92.8)
