@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://rfeniu4qgwyu"]
+
+[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="1_ldth5"]
+[ext_resource type="PackedScene" uid="uid://buv5dd7bdglrl" path="res://cola.tscn" id="2_a2kt7"]
+[ext_resource type="PackedScene" uid="uid://cw7ukhm8n81dc" path="res://chikin.tscn" id="2_ydppn"]
+[ext_resource type="PackedScene" uid="uid://cpkt0747821ve" path="res://daikon.tscn" id="3_yk8n3"]
+[ext_resource type="PackedScene" uid="uid://cssr0fg55gr3x" path="res://orange.tscn" id="4_c4wsi"]
+
+[node name="Node2D" type="Node2D" unique_id=90045965]
+
+[node name="Chikin" parent="." unique_id=1187842508 instance=ExtResource("2_ydppn")]
+position = Vector2(610, -150)
+collision_layer = 3
+collision_mask = 3
+mass = 0.143
+
+[node name="Orange" parent="." unique_id=24999337 instance=ExtResource("4_c4wsi")]
+position = Vector2(613, -312)
+collision_layer = 3
+collision_mask = 3
+mass = 0.34
+
+[node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("3_yk8n3")]
+position = Vector2(667, -26)
+collision_layer = 3
+collision_mask = 3
+mass = 0.494
+
+[node name="Cola" parent="." unique_id=1170558013 instance=ExtResource("2_a2kt7")]
+position = Vector2(504, -287)
+collision_mask = 3
+mass = 0.143
+
+[node name="Bag" parent="." unique_id=148969257 instance=ExtResource("1_ldth5")]
+position = Vector2(577, 82)
