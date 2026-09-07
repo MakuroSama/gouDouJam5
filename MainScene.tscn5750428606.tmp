@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://d2si4er2oavfh"]
+
+[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="1_3mqji"]
+[ext_resource type="PackedScene" uid="uid://b3d11nerq1hrv" path="res://Link.tscn" id="1_x4av3"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_afvsk"]
+normal = Vector2(0.0041321963, -0.9999915)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_503qj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_afvsk"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mj2s3"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w2uv2"]
+
+[node name="Node2D" type="Node2D" unique_id=1081906323]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1285736064]
+position = Vector2(0, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1767728716]
+shape = SubResource("WorldBoundaryShape2D_afvsk")
+
+[node name="Chain" parent="." unique_id=148969257 instance=ExtResource("1_3mqji")]
+position = Vector2(400, 100)
+link_scene = ExtResource("1_x4av3")
+break_threshold = 300.0
+hook_path = NodePath("../Hook")
+hook2_path = NodePath("../Hook2")
+stiffness = 300.0
+damping = 1.0
+
+[node name="Hook" type="StaticBody2D" parent="." unique_id=141378070]
+position = Vector2(400, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hook" unique_id=155148067]
+shape = SubResource("CircleShape2D_503qj")
+
+[node name="Hook2" type="StaticBody2D" parent="." unique_id=1561834364]
+position = Vector2(700, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hook2" unique_id=1712605223]
+shape = SubResource("CircleShape2D_afvsk")
+
+[node name="randomball" type="RigidBody2D" parent="." unique_id=1688824442]
+position = Vector2(500, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="randomball" unique_id=1921111695]
+shape = SubResource("CircleShape2D_mj2s3")
+
+[node name="Sprite2D" type="Sprite2D" parent="randomball" unique_id=1988899398]
+texture = SubResource("PlaceholderTexture2D_w2uv2")

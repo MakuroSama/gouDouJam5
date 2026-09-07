@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://drbo4mbruunlg"]
+
+[ext_resource type="Script" uid="uid://dt02r0xkkigoj" path="res://bag.gd" id="1_kksag"]
+[ext_resource type="PackedScene" uid="uid://b3d11nerq1hrv" path="res://Link.tscn" id="2_cknj3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_503qj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_afvsk"]
+
+[node name="Bag" type="Node2D" unique_id=148969257]
+script = ExtResource("1_kksag")
+link_scene = ExtResource("2_cknj3")
+width = 800
+break_threshold = 500.0
+hook_path = NodePath("LeftHook")
+hook2_path = NodePath("rightHook")
+
+[node name="LeftHook" type="StaticBody2D" parent="." unique_id=1169727133]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftHook" unique_id=565409254]
+shape = SubResource("RectangleShape2D_503qj")
+
+[node name="rightHook" type="StaticBody2D" parent="." unique_id=1137017769]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="rightHook" unique_id=830288554]
+shape = SubResource("RectangleShape2D_afvsk")

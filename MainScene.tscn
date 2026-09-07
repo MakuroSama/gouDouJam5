@@ -1,3 +1,45 @@
 [gd_scene format=3 uid="uid://d2si4er2oavfh"]
 
+[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="1_3mqji"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mj2s3"]
+radius = 40.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w2uv2"]
+
 [node name="Node2D" type="Node2D" unique_id=1081906323]
+
+[node name="randomball" type="RigidBody2D" parent="." unique_id=1688824442]
+position = Vector2(945, -202)
+collision_layer = 1025
+collision_mask = 1025
+mass = 0.004
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="randomball" unique_id=1921111695]
+shape = SubResource("CircleShape2D_mj2s3")
+
+[node name="Sprite2D" type="Sprite2D" parent="randomball" unique_id=1988899398]
+position = Vector2(-1.14142895e-05, 2)
+scale = Vector2(63.000023, 60.000004)
+texture = SubResource("PlaceholderTexture2D_w2uv2")
+
+[node name="randomball2" type="RigidBody2D" parent="." unique_id=466895271]
+position = Vector2(1456, 101)
+collision_layer = 1025
+collision_mask = 1025
+mass = 0.203
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="randomball2" unique_id=1319968640]
+shape = SubResource("CircleShape2D_mj2s3")
+
+[node name="Sprite2D" type="Sprite2D" parent="randomball2" unique_id=159618459]
+position = Vector2(-1.14142895e-05, 2)
+scale = Vector2(63.000023, 60.000004)
+texture = SubResource("PlaceholderTexture2D_w2uv2")
+
+[node name="Bag" parent="." unique_id=148969257 instance=ExtResource("1_3mqji")]
+position = Vector2(1218, 552)
+points = 6
+stiffness = 10.0
+damping_ratio = 0.5
+link_collision_radius = 30.0
