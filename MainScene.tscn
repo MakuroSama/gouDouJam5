@@ -1,52 +1,100 @@
 [gd_scene format=3 uid="uid://d2si4er2oavfh"]
 
-[ext_resource type="PackedScene" uid="uid://cpkt0747821ve" path="res://daikon.tscn" id="1_x4av3"]
-[ext_resource type="PackedScene" uid="uid://buv5dd7bdglrl" path="res://cola.tscn" id="2_rpqi1"]
-[ext_resource type="PackedScene" uid="uid://cssr0fg55gr3x" path="res://orange.tscn" id="3_rpqi1"]
-[ext_resource type="PackedScene" uid="uid://cf6dywaya67uy" path="res://sports.tscn" id="4_uxrcv"]
-[ext_resource type="PackedScene" uid="uid://dq72tyole7dw4" path="res://tea.tscn" id="5_rf2cd"]
-[ext_resource type="PackedScene" uid="uid://dfggn7owtolmf" path="res://potato.tscn" id="6_a814b"]
-[ext_resource type="PackedScene" uid="uid://cfnbdcv5e7xny" path="res://negi.tscn" id="7_hbc2u"]
-[ext_resource type="PackedScene" uid="uid://de43nvjidnaya" path="res://broccoli.tscn" id="8_torvr"]
-[ext_resource type="PackedScene" uid="uid://bohxs07kv8dhu" path="res://beef.tscn" id="9_torvr"]
-[ext_resource type="PackedScene" uid="uid://cw7ukhm8n81dc" path="res://chikin.tscn" id="10_8xkvn"]
-[ext_resource type="PackedScene" uid="uid://cm1ofogty31su" path="res://pork.tscn" id="11_p5x2j"]
-[ext_resource type="PackedScene" uid="uid://lleya3ifbh5j" path="res://salmon.tscn" id="12_yvb8b"]
-[ext_resource type="PackedScene" uid="uid://xcwrwlbvj4ai" path="res://allhigh.tscn" id="13_3hf6u"]
-[ext_resource type="PackedScene" uid="uid://b7vehe6clfmac" path="res://sgelf.tscn" id="14_4mcbk"]
-[ext_resource type="PackedScene" uid="uid://28mt7y6e402a" path="res://price.tscn" id="15_mctxq"]
-[ext_resource type="PackedScene" uid="uid://diig3jjcb3ca4" path="res://title.tscn" id="16_nm5af"]
+[ext_resource type="Script" uid="uid://c364g2es0x6s1" path="res://MainScene.gd" id="1_main_script"]
+[ext_resource type="Texture2D" uid="uid://domw08f2e025r" path="res://Image/Shelf.png" id="2_shelf_tex"]
+[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="3_bag_scene"]
+[ext_resource type="PackedScene" path="res://PriceTag.tscn" id="4_pricetag_scene"]
+[ext_resource type="Texture2D" uid="uid://dqsvs5sdpaeyh" path="res://Image/Back.jpg" id="5_back_tex"]
 
-[node name="Main" type="Node2D" unique_id=1081906323]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2100, 60)
 
-[node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("1_x4av3")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf_tier"]
+size = Vector2(1050, 24)
 
-[node name="Cola" parent="." unique_id=1170558013 instance=ExtResource("2_rpqi1")]
+[node name="MainScene" type="Node2D" unique_id=1995663294]
+script = ExtResource("1_main_script")
 
-[node name="Orange" parent="." unique_id=24999337 instance=ExtResource("3_rpqi1")]
+[node name="Background" type="TextureRect" parent="." unique_id=575543239]
+z_index = -100
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_back_tex")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Sports" parent="." unique_id=1962389092 instance=ExtResource("4_uxrcv")]
+[node name="FloorStaticBody" type="StaticBody2D" parent="." unique_id=241712913]
+position = Vector2(960, 1070)
 
-[node name="Tea" parent="." unique_id=761728632 instance=ExtResource("5_rf2cd")]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloorStaticBody" unique_id=1128510190]
+shape = SubResource("RectangleShape2D_floor")
 
-[node name="Potato" parent="." unique_id=1187822617 instance=ExtResource("6_a814b")]
+[node name="Shelf" type="StaticBody2D" parent="." unique_id=1849108432]
+position = Vector2(1340, 715)
 
-[node name="Negi" parent="." unique_id=1549638287 instance=ExtResource("7_hbc2u")]
+[node name="Sprite2D" type="Sprite2D" parent="Shelf" unique_id=2011262141]
+scale = Vector2(1.35, 1.35)
+texture = ExtResource("2_shelf_tex")
 
-[node name="Broccoli" parent="." unique_id=959037203 instance=ExtResource("8_torvr")]
+[node name="TierTop" type="CollisionShape2D" parent="Shelf" unique_id=186629760]
+position = Vector2(0, -135)
+shape = SubResource("RectangleShape2D_shelf_tier")
 
-[node name="Beef" parent="." unique_id=1451232285 instance=ExtResource("9_torvr")]
+[node name="TierMid" type="CollisionShape2D" parent="Shelf" unique_id=537921294]
+position = Vector2(0, 50)
+shape = SubResource("RectangleShape2D_shelf_tier")
 
-[node name="Chikin" parent="." unique_id=1187842508 instance=ExtResource("10_8xkvn")]
+[node name="TierBottom" type="CollisionShape2D" parent="Shelf" unique_id=714369670]
+position = Vector2(0, 235)
+shape = SubResource("RectangleShape2D_shelf_tier")
 
-[node name="Pork" parent="." unique_id=709893473 instance=ExtResource("11_p5x2j")]
+[node name="ShelfSlots" type="Node2D" parent="." unique_id=1384142616]
 
-[node name="Salmon" parent="." unique_id=755192589 instance=ExtResource("12_yvb8b")]
+[node name="Slot0" type="Marker2D" parent="ShelfSlots" unique_id=2077096004]
+position = Vector2(1040, 520)
 
-[node name="Allhigh" parent="." unique_id=1692300567 instance=ExtResource("13_3hf6u")]
+[node name="Slot1" type="Marker2D" parent="ShelfSlots" unique_id=1321519015]
+position = Vector2(1580, 520)
 
-[node name="Sgelf" parent="." unique_id=2063348470 instance=ExtResource("14_4mcbk")]
+[node name="Slot2" type="Marker2D" parent="ShelfSlots" unique_id=1554466722]
+position = Vector2(1040, 705)
 
-[node name="Price" parent="." unique_id=2035521385 instance=ExtResource("15_mctxq")]
+[node name="Slot3" type="Marker2D" parent="ShelfSlots" unique_id=1254991769]
+position = Vector2(1580, 705)
 
-[node name="Title" parent="." unique_id=982053829 instance=ExtResource("16_nm5af")]
+[node name="Slot4" type="Marker2D" parent="ShelfSlots" unique_id=2118644985]
+position = Vector2(1040, 890)
+
+[node name="Slot5" type="Marker2D" parent="ShelfSlots" unique_id=598614743]
+position = Vector2(1580, 890)
+
+[node name="PriceTags" type="Node2D" parent="." unique_id=36228385]
+
+[node name="PriceTag0" parent="PriceTags" unique_id=760338695 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1170, 575)
+
+[node name="PriceTag1" parent="PriceTags" unique_id=916290330 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1710, 575)
+
+[node name="PriceTag2" parent="PriceTags" unique_id=1129730571 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1170, 760)
+
+[node name="PriceTag3" parent="PriceTags" unique_id=825411722 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1710, 760)
+
+[node name="PriceTag4" parent="PriceTags" unique_id=26228037 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1170, 945)
+
+[node name="PriceTag5" parent="PriceTags" unique_id=1468512766 instance=ExtResource("4_pricetag_scene")]
+position = Vector2(1710, 945)
+
+[node name="Bag" parent="." unique_id=10843787 instance=ExtResource("3_bag_scene")]
+position = Vector2(400, 520)
+width = 380.0
+stiffness = 2200.0
+break_threshold = 120.0
