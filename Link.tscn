@@ -1,18 +1,6 @@
 [gd_scene format=3 uid="uid://b3d11nerq1hrv"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_qtg8b"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_qtg8b"]
-radius = 210.46616
-
 [node name="RigidBody2D" type="RigidBody2D" unique_id=507715670]
-collision_layer = 1024
+collision_layer = 0
+collision_mask = 0
 mass = 0.001
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=894188241]
-position = Vector2(-4.7683716e-07, -3.5762787e-07)
-scale = Vector2(14.000001, 14.000001)
-texture = SubResource("PlaceholderTexture2D_qtg8b")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1280478228]
-shape = SubResource("CircleShape2D_qtg8b")
