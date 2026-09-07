@@ -54,7 +54,7 @@ func spawn_shelf_items() -> void:
 	for i in range(slots.size()):
 		spawn_item_at_slot(i)
 
-# 指定した1つのスロットに新しい商品を補充する
+# 使用した1つのスロットに新しい商品を補充する
 func spawn_item_at_slot(slot_idx: int) -> void:
 	if slot_idx < 0 or slot_idx >= slots.size():
 		return
@@ -87,15 +87,14 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.global_position = slot.global_position
 	add_child(item)
 	
-	# 25%の確率で「特選」シール（特選の場合は金額がさらに5倍！）
+
 	var is_special = randf() < 0.25
 	var final_price: int = calculated_price
 	
 	if is_special:
 		final_price *= 5
 		_attach_special_sticker(item)
-	
-	# 値札の金額を設定＆表示をくっきり戻す
+
 	price_tag.set_price(final_price, is_special)
 	price_tag.modulate.a = 1.0
 	
@@ -104,8 +103,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.set_meta("price", final_price)
 	item.set_meta("is_special", is_special)
 	item.set_meta("size_scale", size_scale)
-	
-	# ポンッと出現するポップイン演出
+
 	item.scale = Vector2.ZERO
 	var tween = create_tween()
 	tween.tween_property(item, "scale", Vector2(size_scale, size_scale), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -152,8 +150,6 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 			grabbed_item.freeze = true
 			grabbed_item.z_index = 50 # 掴んでいる間は一番手前に表示
 			
-			# ★完全解決: ドラッグ中は layer=0, mask=0 にして物理世界から完全に消す！
-			# 袋のリンク（mask 1）からも絶対に検知されず、横から触れても1ミリも袋に力がかからない！
 			grabbed_item.collision_layer = 0
 			grabbed_item.collision_mask = 0
 			
@@ -173,32 +169,28 @@ func _release_grabbed_item() -> void:
 		grabbed_item.linear_velocity = mouse_velocity.clamp(Vector2(-1500, -1500), Vector2(1500, 1500)) * 0.5
 		
 		var slot_idx: int = grabbed_item.get_meta("slot_index", -1)
-		
-		# ★上から袋の開口部に向けて落とした場合のみ、袋の中に入る！
+
 		if _is_above_bag_opening(grabbed_item.global_position):
-			# 袋（Layer 2）との衝突をONにして袋の中に投入！
+
 			grabbed_item.collision_layer = 3
 			grabbed_item.collision_mask = 3
 			
 			# 袋に入ったのでスロットの紐付けを解除
 			grabbed_item.set_meta("slot_index", -1)
 			
-			# ★次の商品を棚の空いたスロットに0.4秒後に補充！
 			if slot_idx >= 0:
 				get_tree().create_timer(0.4).timeout.connect(func(): spawn_item_at_slot(slot_idx))
 		else:
-			# 横や外側で離した場合は袋と絶対に衝突させず、床（Layer 1）だけに落とす
-			grabbed_item.collision_layer = 4 # 袋のリンク（mask 1）には当たらないレイヤー
-			grabbed_item.collision_mask = 1  # 床にだけ当たる
-			
-			# 外に落とした場合も棚が空きっぱなしにならないよう少し待ってから補充
+		
+			grabbed_item.collision_layer = 4 
+			grabbed_item.collision_mask = 1  
+
 			grabbed_item.set_meta("slot_index", -1)
 			if slot_idx >= 0:
 				get_tree().create_timer(0.8).timeout.connect(func(): spawn_item_at_slot(slot_idx))
 			
 		grabbed_item = null
 
-# 袋の開口部（上空）にあるかどうかの判定
 func _is_above_bag_opening(item_pos: Vector2) -> bool:
 	if not has_node("Bag"):
 		return false
@@ -208,7 +200,6 @@ func _is_above_bag_opening(item_pos: Vector2) -> bool:
 	var bag_w = bag_node.width if "width" in bag_node else 380.0
 	var half_w = (bag_w * 0.5) + 30.0 # 開口部の横幅（左右マージン付き）
 	
-	# X座標が開口部の範囲内、かつ Y座標が袋の口の上（袋の口より高い位置）にあるか
 	var is_in_x = (item_pos.x >= bag_pos.x - half_w) and (item_pos.x <= bag_pos.x + half_w)
 	var is_above_y = item_pos.y <= (bag_pos.y + 30.0)
 	
