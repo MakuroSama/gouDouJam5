@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://28mt7y6e402a"]
+
+[ext_resource type="Texture2D" uid="uid://d0yvpojqbi8e4" path="res://Image/Price.png" id="1_vkd5t"]
+
+[node name="Price" type="StaticBody2D" unique_id=2035521385]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1122798572]
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("1_vkd5t")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1926303403]
+scale = Vector2(0.4, 0.4)
+polygon = PackedVector2Array(-97.5, -59, -97.5, 59, 97.5, 59, 97.5, -59)

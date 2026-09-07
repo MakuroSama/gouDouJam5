@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dnusflh6lw26v" path="res://Image/negi.png" id="1_mmwpd"]
 
-[node name="Negi" type="StaticBody2D" unique_id=1549638287]
+[node name="Negi" type="RigidBody2D" unique_id=1549638287]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=581218613]
 scale = Vector2(0.2, 0.2)

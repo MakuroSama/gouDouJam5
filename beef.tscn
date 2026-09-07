@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://b04jhg6axe1ad" path="res://Image/beef.png" id="1_2makf"]
 
-[node name="Beef" type="StaticBody2D" unique_id=1451232285]
+[node name="Beef" type="RigidBody2D" unique_id=1451232285]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1312148869]
 scale = Vector2(0.2, 0.2)

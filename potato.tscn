@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://hk3ceep62oe7" path="res://Image/potato.png" id="1_5wy20"]
 
-[node name="Potato" type="StaticBody2D" unique_id=1187822617]
+[node name="Potato" type="RigidBody2D" unique_id=1187822617]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1116991141]
 scale = Vector2(0.2, 0.2)
