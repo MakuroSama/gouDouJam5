@@ -9,27 +9,27 @@
 [node name="Node2D" type="Node2D" unique_id=90045965]
 
 [node name="Chikin" parent="." unique_id=1187842508 instance=ExtResource("2_ydppn")]
-position = Vector2(610, -150)
+position = Vector2(489, 93)
 collision_layer = 3
 collision_mask = 3
-mass = 0.143
+mass = 0.288
 
 [node name="Orange" parent="." unique_id=24999337 instance=ExtResource("4_c4wsi")]
-position = Vector2(613, -312)
+position = Vector2(547, -2)
 collision_layer = 3
 collision_mask = 3
 mass = 0.34
 
 [node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("3_yk8n3")]
-position = Vector2(667, -26)
+position = Vector2(664, 59)
 collision_layer = 3
 collision_mask = 3
-mass = 0.494
+mass = 0.082
 
 [node name="Cola" parent="." unique_id=1170558013 instance=ExtResource("2_a2kt7")]
-position = Vector2(504, -287)
+position = Vector2(594, 167)
 collision_mask = 3
-mass = 0.143
+mass = 0.91
 
 [node name="Bag" parent="." unique_id=148969257 instance=ExtResource("1_ldth5")]
 position = Vector2(577, 82)

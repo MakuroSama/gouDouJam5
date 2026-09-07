@@ -82,7 +82,7 @@ var maximum_stretch: float = 1.08
 @export_category("Rendering")
 
 @export var draw_bag: bool = true
-@export var bag_line_width: float = 64
+@export var bag_line_width: float = 2
 @export var smooth_subdivisions: int = 40
 @export var bag_color: Color = Color(0.15, 0.55, 1.0)
 
@@ -524,6 +524,7 @@ func _break_joint(
 
 func _draw() -> void:
 
+
 	if not draw_bag:
 		return
 
@@ -539,14 +540,41 @@ func _draw() -> void:
 	if raw_points.size() < 2:
 		return
 
+	# --------------------------------------------------------
+	# PUSH POINTS OUTWARD FROM CENTER
+	#
+	# raw_points only traces link CENTERS. Offsetting each
+	# point away from the bag's centroid by ~link_collision_radius
+	# makes the line trace the bag's outer surface instead,
+	# so we don't need a huge line width to fake volume.
+	# --------------------------------------------------------
+
+	var center := Vector2.ZERO
+
+	for p in raw_points:
+		center += p
+
+	center /= raw_points.size()
+
+	var offset_points: Array[Vector2] = []
+
+	for p in raw_points:
+
+		var direction := p - center
+
+		if direction.length() > 0.001:
+			direction = direction.normalized()
+		else:
+			direction = Vector2.UP
+
+		offset_points.append(p - direction * link_collision_radius)
+
 	var subdivisions = max(smooth_subdivisions, 1)
 
-	var smooth_points := _smooth_points(raw_points, subdivisions)
+	var smooth_points := _smooth_points(offset_points, subdivisions)
 
 	for i in range(smooth_points.size() - 1):
 
-		# Map this smoothed segment back to the original link pair
-		# it was generated from, so broken pairs actually get skipped.
 		var orig_segment = i / subdivisions
 
 		if orig_segment < broken.size() and broken[orig_segment]:
