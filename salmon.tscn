@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://5segr2efjoo" path="res://Image/salmon.png" id="1_81nhv"]
 
-[node name="Salmon" type="StaticBody2D" unique_id=755192589]
+[node name="Salmon" type="RigidBody2D" unique_id=755192589]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=17172161]
 scale = Vector2(0.2, 0.2)

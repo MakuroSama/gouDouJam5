@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://df7s5k8gfubv3" path="res://Image/cola.png" id="1_3ndp3"]
 
-[node name="Cola" type="StaticBody2D" unique_id=1170558013]
+[node name="Cola" type="RigidBody2D" unique_id=1170558013]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1337109617]
 scale = Vector2(0.2, 0.2)
