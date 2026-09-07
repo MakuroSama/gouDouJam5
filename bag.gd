@@ -1,123 +1,635 @@
+
 extends Node2D
 class_name Chain
 
-@export var link_scene: PackedScene
-@export var width = 200
-@export var break_threshold: float = 35.0
-@export var hook_path: NodePath   # top-left
-@export var hook2_path: NodePath  # top-right
-@export var points: int = 10
-@export var stiffness: float = 10000.0
-@export var damping_ratio: float = 1.0
-@export var link_collision_radius: float = 8.0  # NEW: used to size overlap
 
+# ============================================================
+# BAG
+# ============================================================
+
+@export_category("Bag")
+
+@export var link_scene: PackedScene
+
+@export var width: float = 200.0
+
+@export_range(8, 100, 1)
+var points: int = 24
+
+@export var link_collision_radius: float = 10.0
+
+# Collision circles overlap by this amount.
+@export_range(1.0, 2.0, 0.05)
+var collision_overlap: float = 1.25
+
+
+# ============================================================
+# PHYSICS
+# ============================================================
+
+@export_category("Physics")
+
+# Higher = harder bag.
+@export var stiffness: float = 1800.0
+
+# Higher = less bouncing.
+@export var damping_ratio: float = 1.5
+
+# How much a link can stretch before the constraint
+# starts strongly pulling it back.
+#
+# 1.0 = no stretch
+# 1.05 = 5% stretch
+# 1.15 = 15% stretch
+@export_range(1.0, 1.5, 0.01)
+var maximum_stretch: float = 1.08
+
+# Strength of the hard length constraint.
+@export var constraint_strength: float = 80.0
+
+# Prevents violent movement when a box hits the bag.
+@export var link_linear_damping: float = 3.0
+@export var link_angular_damping: float = 5.0
+
+# Mass of each bag link.
+@export var link_mass: float = 1.0
+
+
+# ============================================================
+# HOOKS
+# ============================================================
+
+@export_category("Hooks")
+
+@export var hook_path: NodePath
+@export var hook2_path: NodePath
+
+
+# ============================================================
+# BREAKING
+# ============================================================
+
+@export_category("Breaking")
+
+# Set to 0 to effectively disable breaking.
+@export var break_threshold: float = 0.0
+
+
+# ============================================================
+# RENDERING
+# ============================================================
+
+@export_category("Rendering")
+
+@export var draw_bag: bool = true
+@export var bag_line_width: float = 5.0
+@export var smooth_subdivisions: int = 5
+@export var bag_color: Color = Color(0.15, 0.55, 1.0)
+
+
+# ============================================================
+# INTERNAL
+# ============================================================
 
 var links: Array[RigidBody2D] = []
 var joints: Array[DampedSpringJoint2D] = []
-var height
 
-var collision_body: StaticBody2D
-var collision_polygon: CollisionPolygon2D
+# Original distance between neighboring links.
+var rest_distances: Array[float] = []
 
-func _ready():
-	$LeftHook.position.x = -width/2.0
-	$rightHook.position.x = width/2.0
+var left_hook: Node2D
+var right_hook: Node2D
+
+
+# ============================================================
+# READY
+# ============================================================
+
+func _ready() -> void:
+
+	$LeftHook.position.x = -width / 2.0
+	$rightHook.position.x = width / 2.0
+
+	left_hook = get_node_or_null(hook_path)
+	right_hook = get_node_or_null(hook2_path)
+
+	if left_hook == null:
+		left_hook = $LeftHook
+
+	if right_hook == null:
+		right_hook = $rightHook
+
 	_build_bag()
 	_connect_hooks()
 
+	queue_redraw()
+
+
+# ============================================================
+# CREATE LINK
+# ============================================================
+
 func _make_link(pos: Vector2) -> RigidBody2D:
-	var link = link_scene.instantiate()
+
+	if link_scene == null:
+		push_error("Chain: link_scene is not assigned.")
+		return null
+
+	var link := link_scene.instantiate() as RigidBody2D
+
+	if link == null:
+		push_error("Chain: link_scene must contain a RigidBody2D.")
+		return null
+
 	add_child(link)
+
 	link.global_position = pos
 
-	# NEW: prevent fast/heavy objects tunneling through this link
+	# --------------------------------------------------------
+	# PHYSICS
+	# --------------------------------------------------------
+
+	link.mass = link_mass
+
+	link.linear_damp = link_linear_damping
+	link.angular_damp = link_angular_damping
+
+	# Prevent fast falling objects from tunneling through
+	# individual bag links.
 	link.continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
 
+	link.freeze = false
+
+	# --------------------------------------------------------
+	# COLLIDER
+	# --------------------------------------------------------
+
+	_create_smooth_collider(link)
+
 	links.append(link)
+
 	return link
 
-func _spring(a: RigidBody2D, b: RigidBody2D):
-	var dist = a.global_position.distance_to(b.global_position)
-	if dist < 0.01:
-		push_warning("Chain: overlapping links, skipping spring")
-		return
-	
-	var joint = DampedSpringJoint2D.new()
-	add_child(joint)
-	joint.global_position = (a.global_position + b.global_position) / 2.0
-	joint.node_a = a.get_path()
-	joint.node_b = b.get_path()
-	joint.disable_collision = true
-	var avg_mass = (a.mass + b.mass) / 2.0
-	#joint.softness = 1
-	joint.damping = damping_ratio*2.0 * sqrt(stiffness * avg_mass)  # critically damped baseline
-	joint.stiffness = stiffness * points
-	joint.length = dist
-	joint.rest_length = dist
-	joints.append(joint)
 
-func _build_bag():
-	var leftHook = get_node_or_null(hook_path)
-	var rightHook = get_node_or_null(hook2_path)
-	var center =( rightHook.global_position + leftHook.global_position) /2
-	# NEW: auto-tighten spacing so consecutive link colliders overlap
-	# instead of leaving gaps for objects to fall through
-	var total_dist = leftHook.global_position.distance_to(rightHook.global_position)
-	var max_points_needed = int(ceil(total_dist / (link_collision_radius * 1.2)))
-	if points < max_points_needed:
-		push_warning("Chain: 'points' too low for gapless bag, consider raising it to at least %d" % max_points_needed)
+# ============================================================
+# CREATE SMOOTH CIRCLE COLLIDER
+# ============================================================
+
+func _create_smooth_collider(link: RigidBody2D) -> void:
+
+	# Remove the collider created by this script if one exists.
+	var old := link.get_node_or_null("_BagCollider")
+
+	if old != null:
+		old.queue_free()
+
+	var collision := CollisionShape2D.new()
+
+	collision.name = "_BagCollider"
+
+	var circle := CircleShape2D.new()
+
+	circle.radius = link_collision_radius
+
+	collision.shape = circle
+
+	link.add_child(collision)
+
+	# --------------------------------------------------------
+	# BAG COLLISION
+	#
+	# BAG = layer 2
+	# BOX = layer 1
+	# --------------------------------------------------------
+
+	link.collision_layer = 2
+	link.collision_mask = 1
+
+
+# ============================================================
+# BUILD BAG
+# ============================================================
+
+func _build_bag() -> void:
+
+	if left_hook == null or right_hook == null:
+		push_error("Chain: Could not find hooks.")
+		return
+
+	# --------------------------------------------------------
+	# CLEAN OLD BAG
+	# --------------------------------------------------------
+
+	for link in links:
+		if is_instance_valid(link):
+			link.queue_free()
+
+	for joint in joints:
+		if is_instance_valid(joint):
+			joint.queue_free()
+
+	links.clear()
+	joints.clear()
+	rest_distances.clear()
+
+
+	# --------------------------------------------------------
+	# BAG GEOMETRY
+	# --------------------------------------------------------
+
+	var left_position := left_hook.global_position
+	var right_position := right_hook.global_position
+
+	var center := (
+		left_position + right_position
+	) * 0.5
+
+	var total_width := left_position.distance_to(
+		right_position
+	)
+
+	var radius := total_width * 0.5
+
+
+	# --------------------------------------------------------
+	# AUTOMATIC POINT COUNT
+	# --------------------------------------------------------
+
+	var spacing := (
+		link_collision_radius * 2.0
+		/ collision_overlap
+	)
+
+	var minimum_points := int(
+		ceil(total_width / spacing)
+	) + 1
+
+	points = max(points, minimum_points)
+
+
+	# --------------------------------------------------------
+	# CREATE U SHAPE
+	# --------------------------------------------------------
 
 	for i in range(points):
-		var angle = i * PI / (points - 1 )
-		var pos:Vector2 =  center + Vector2(cos(angle), sin(angle)) * (total_dist/2)
-		_make_link(pos)
-	for i in links.size() -1:
-		_spring(links[i], links[i + 1])
 
-func _connect_hooks():
-	_add_hook(hook2_path, links[0])
-	_add_hook(hook_path, links[links.size()-1])
+		var t := float(i) / float(points - 1)
 
-func _add_hook(hook_path_: NodePath, link: RigidBody2D):
-	if hook_path_.is_empty():
-		push_warning("Chain: hook path not set!")
+		var angle := t * PI
+
+		var position := center + Vector2(
+			cos(angle) * radius,
+			sin(angle) * radius
+		)
+
+		_make_link(position)
+
+
+	# --------------------------------------------------------
+	# CONNECT LINKS
+	# --------------------------------------------------------
+
+	for i in range(links.size() - 1):
+
+		_create_spring(
+			links[i],
+			links[i + 1]
+		)
+
+
+# ============================================================
+# CREATE SPRING
+# ============================================================
+
+func _create_spring(
+	a: RigidBody2D,
+	b: RigidBody2D
+) -> void:
+
+	if a == null or b == null:
 		return
-	var hook_node = get_node_or_null(hook_path_)
-	if hook_node == null:
-		push_warning("Chain: hook path set but node not found: " + str(hook_path_))
+
+	var distance := a.global_position.distance_to(
+		b.global_position
+	)
+
+	if distance <= 0.01:
 		return
-	var anchor_joint = PinJoint2D.new()
-	add_child(anchor_joint)
-	anchor_joint.global_position = hook_node.global_position
-	anchor_joint.node_a = hook_node.get_path()
-	anchor_joint.node_b = link.get_path()
-	anchor_joint.disable_collision = true
-	anchor_joint.softness = 0.0
+
+	# Remember the ORIGINAL spacing.
+	rest_distances.append(distance)
+
+	var joint := DampedSpringJoint2D.new()
+
+	add_child(joint)
+
+	joint.global_position = (
+		a.global_position +
+		b.global_position
+	) * 0.5
+
+	joint.node_a = a.get_path()
+	joint.node_b = b.get_path()
+
+	# Neighboring links must not collide with one another.
+	joint.disable_collision = true
+
+	joint.length = distance
+	joint.rest_length = distance
+
+	joint.stiffness = stiffness
+
+	var average_mass := (
+		a.mass + b.mass
+	) * 0.5
+
+	average_mass = max(average_mass, 0.01)
+
+	joint.damping = (
+		damping_ratio *
+		2.0 *
+		sqrt(stiffness * average_mass)
+	)
+
+	joints.append(joint)
 
 
-func _physics_process(_delta):
-	for joint in joints.duplicate():
-		if not is_instance_valid(joint):
+# ============================================================
+# HOOKS
+# ============================================================
+
+func _connect_hooks() -> void:
+
+	if links.size() < 2:
+		return
+
+	_add_hook(
+		right_hook,
+		links[0]
+	)
+
+	_add_hook(
+		left_hook,
+		links[links.size() - 1]
+	)
+
+
+func _add_hook(
+	hook: Node2D,
+	link: RigidBody2D
+) -> void:
+
+	if hook == null or link == null:
+		return
+
+	var joint := PinJoint2D.new()
+
+	add_child(joint)
+
+	joint.global_position = hook.global_position
+
+	joint.node_a = hook.get_path()
+	joint.node_b = link.get_path()
+
+	joint.disable_collision = true
+
+	joint.softness = 0.0
+
+
+# ============================================================
+# PHYSICS CONSTRAINT
+# ============================================================
+
+func _physics_process(_delta: float) -> void:
+
+	if links.size() < 2:
+		return
+
+
+	# --------------------------------------------------------
+	# HARD LENGTH CONSTRAINT
+	# --------------------------------------------------------
+	#
+	# This is the important part.
+	#
+	# The spring alone is allowed to stretch.
+	# This constraint stops the bag from becoming infinitely
+	# long.
+	#
+
+	for i in range(links.size() - 1):
+
+		var a := links[i]
+		var b := links[i + 1]
+
+		if not is_instance_valid(a) or not is_instance_valid(b):
 			continue
-		var body_a = get_node(joint.node_a) as RigidBody2D
-		var body_b = get_node(joint.node_b) as RigidBody2D
-		if not body_a or not body_b:
+
+		var difference := (
+			b.global_position -
+			a.global_position
+		)
+
+		var distance := difference.length()
+
+		if distance <= 0.001:
 			continue
-		if body_a.global_position.distance_to(body_b.global_position) > break_threshold:
-			break_joint(joint)
+
+		if i >= rest_distances.size():
+			continue
+
+		var rest_length := rest_distances[i]
+
+		var maximum_length := (
+			rest_length *
+			maximum_stretch
+		)
+
+		# Only correct the chain when it is actually
+		# stretched beyond its allowed length.
+		if distance > maximum_length:
+
+			var direction := difference / distance
+
+			var error := (
+				distance -
+				maximum_length
+			)
+
+			# Pull both links toward one another.
+			var correction_force := (
+				direction *
+				error *
+				constraint_strength
+			)
+
+			a.apply_central_force(
+				correction_force
+			)
+
+			b.apply_central_force(
+				-correction_force
+			)
+
+
+	# --------------------------------------------------------
+	# BREAKING
+	# --------------------------------------------------------
+
+	if break_threshold > 0.0:
+
+		for joint in joints.duplicate():
+
+			if not is_instance_valid(joint):
+				continue
+
+			var a := get_node_or_null(
+				joint.node_a
+			) as RigidBody2D
+
+			var b := get_node_or_null(
+				joint.node_b
+			) as RigidBody2D
+
+			if a == null or b == null:
+				continue
+
+			var distance := a.global_position.distance_to(
+				b.global_position
+			)
+
+			if distance > break_threshold:
+
+				_break_joint(joint)
+
+
 	queue_redraw()
-func break_joint(joint: DampedSpringJoint2D):
+
+
+# ============================================================
+# BREAK JOINT
+# ============================================================
+
+func _break_joint(
+	joint: DampedSpringJoint2D
+) -> void:
+
+	if joint == null:
+		return
+
 	joints.erase(joint)
+
 	joint.queue_free()
 
-func _draw():
-	
-	if joints == null:
+
+# ============================================================
+# SMOOTH BAG DRAWING
+# ============================================================
+
+func _draw() -> void:
+
+	if not draw_bag:
 		return
-	for i in joints:
-		var node_a = get_node_or_null(i.node_a)
-		var node_b = get_node_or_null(i.node_b)
-		if node_a and node_b:
-			var from = to_local(node_a.global_position)
-			var to = to_local(node_b.global_position)
-			draw_line(from, to, Color(i.damping,0,i.stiffness/2000), 2.0)
+
+	if links.size() < 2:
+		return
+
+	var raw_points: Array[Vector2] = []
+
+	for link in links:
+
+		if is_instance_valid(link):
+
+			raw_points.append(
+				to_local(
+					link.global_position
+				)
+			)
+
+	if raw_points.size() < 2:
+		return
+
+	var smooth_points := _smooth_points(
+		raw_points,
+		smooth_subdivisions
+	)
+
+	for i in range(smooth_points.size() - 1):
+
+		draw_line(
+			smooth_points[i],
+			smooth_points[i + 1],
+			bag_color,
+			bag_line_width,
+			true
+		)
+
+
+# ============================================================
+# CATMULL-ROM SMOOTHING
+# ============================================================
+
+func _smooth_points(
+	points_array: Array[Vector2],
+	subdivisions: int
+) -> Array[Vector2]:
+
+	var result: Array[Vector2] = []
+
+	if points_array.size() < 2:
+		return points_array
+
+	subdivisions = max(
+		subdivisions,
+		1
+	)
+
+	for i in range(points_array.size() - 1):
+
+		var p1 := points_array[i]
+		var p2 := points_array[i + 1]
+
+		var p0: Vector2
+		var p3: Vector2
+
+		if i == 0:
+			p0 = p1
+		else:
+			p0 = points_array[i - 1]
+
+		if i + 2 >= points_array.size():
+			p3 = p2
+		else:
+			p3 = points_array[i + 2]
+
+		for j in range(subdivisions):
+
+			var t := float(j) / float(subdivisions)
+
+			var t2 := t * t
+			var t3 := t2 * t
+
+			var point := 0.5 * (
+				(2.0 * p1) +
+				(-p0 + p2) * t +
+				(
+					2.0 * p0
+					- 5.0 * p1
+					+ 4.0 * p2
+					- p3
+				) * t2 +
+				(
+					-p0
+					+ 3.0 * p1
+					- 3.0 * p2
+					+ p3
+				) * t3
+			)
+
+			result.append(point)
+
+	result.append(
+		points_array[points_array.size() - 1]
+	)
+
+	return result
