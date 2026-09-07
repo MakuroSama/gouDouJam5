@@ -11,12 +11,12 @@ class_name Chain
 
 @export var link_scene: PackedScene
 
-@export var width: float = 200.0
+@export var width: float = 1600.0
 
 @export_range(8, 100, 1)
 var points: int = 24
 
-@export var link_collision_radius: float = 10.0
+@export var link_collision_radius: float = 36
 
 # Collision circles overlap by this amount.
 @export_range(1.0, 2.0, 0.05)
@@ -52,7 +52,7 @@ var maximum_stretch: float = 1.08
 @export var link_angular_damping: float = 5.0
 
 # Mass of each bag link.
-@export var link_mass: float = 1.0
+@export var link_mass: float = 0.05
 
 
 # ============================================================
@@ -72,7 +72,7 @@ var maximum_stretch: float = 1.08
 @export_category("Breaking")
 
 # Set to 0 to effectively disable breaking.
-@export var break_threshold: float = 0.0
+@export var break_threshold: float = 70.0
 
 
 # ============================================================
@@ -82,8 +82,8 @@ var maximum_stretch: float = 1.08
 @export_category("Rendering")
 
 @export var draw_bag: bool = true
-@export var bag_line_width: float = 5.0
-@export var smooth_subdivisions: int = 5
+@export var bag_line_width: float = 360.0
+@export var smooth_subdivisions: int = 40
 @export var bag_color: Color = Color(0.15, 0.55, 1.0)
 
 
@@ -93,7 +93,7 @@ var maximum_stretch: float = 1.08
 
 var links: Array[RigidBody2D] = []
 var joints: Array[DampedSpringJoint2D] = []
-
+var broken: Array[bool] = []
 # Original distance between neighboring links.
 var rest_distances: Array[float] = []
 
@@ -231,7 +231,7 @@ func _build_bag() -> void:
 	links.clear()
 	joints.clear()
 	rest_distances.clear()
-
+	broken.clear()
 
 	# --------------------------------------------------------
 	# BAG GEOMETRY
@@ -277,12 +277,12 @@ func _build_bag() -> void:
 
 		var angle := t * PI
 
-		var position := center + Vector2(
+		var Thisposition := center + Vector2(
 			cos(angle) * radius,
 			sin(angle) * radius
 		)
 
-		_make_link(position)
+		_make_link(Thisposition)
 
 
 	# --------------------------------------------------------
@@ -318,7 +318,7 @@ func _create_spring(
 
 	# Remember the ORIGINAL spacing.
 	rest_distances.append(distance)
-
+	broken.append(false) 
 	var joint := DampedSpringJoint2D.new()
 
 	add_child(joint)
@@ -418,10 +418,11 @@ func _physics_process(_delta: float) -> void:
 	#
 
 	for i in range(links.size() - 1):
-
+		if i < broken.size() and broken[i]:
+			continue 
 		var a := links[i]
 		var b := links[i + 1]
-
+	
 		if not is_instance_valid(a) or not is_instance_valid(b):
 			continue
 
@@ -478,29 +479,22 @@ func _physics_process(_delta: float) -> void:
 
 	if break_threshold > 0.0:
 
-		for joint in joints.duplicate():
+		for i in range(joints.size()):
 
+			if broken[i]:
+				continue
+
+			var joint := joints[i]
 			if not is_instance_valid(joint):
 				continue
 
-			var a := get_node_or_null(
-				joint.node_a
-			) as RigidBody2D
+			var a := links[i]
+			var b := links[i + 1]
 
-			var b := get_node_or_null(
-				joint.node_b
-			) as RigidBody2D
-
-			if a == null or b == null:
-				continue
-
-			var distance := a.global_position.distance_to(
-				b.global_position
-			)
+			var distance := a.global_position.distance_to(b.global_position)
 
 			if distance > break_threshold:
-
-				_break_joint(joint)
+				_break_joint(i)
 
 
 	queue_redraw()
@@ -511,16 +505,18 @@ func _physics_process(_delta: float) -> void:
 # ============================================================
 
 func _break_joint(
-	joint: DampedSpringJoint2D
+	index: int
 ) -> void:
+	print("breaking joint ", index)
 
-	if joint == null:
+	if index < 0 or index >= joints.size():
 		return
 
-	joints.erase(joint)
+	broken[index] = true
 
-	joint.queue_free()
-
+	var joint := joints[index]
+	if is_instance_valid(joint):
+		joint.queue_free()
 
 # ============================================================
 # SMOOTH BAG DRAWING
@@ -537,24 +533,24 @@ func _draw() -> void:
 	var raw_points: Array[Vector2] = []
 
 	for link in links:
-
 		if is_instance_valid(link):
-
-			raw_points.append(
-				to_local(
-					link.global_position
-				)
-			)
+			raw_points.append(to_local(link.global_position))
 
 	if raw_points.size() < 2:
 		return
 
-	var smooth_points := _smooth_points(
-		raw_points,
-		smooth_subdivisions
-	)
+	var subdivisions = max(smooth_subdivisions, 1)
+
+	var smooth_points := _smooth_points(raw_points, subdivisions)
 
 	for i in range(smooth_points.size() - 1):
+
+		# Map this smoothed segment back to the original link pair
+		# it was generated from, so broken pairs actually get skipped.
+		var orig_segment = i / subdivisions
+
+		if orig_segment < broken.size() and broken[orig_segment]:
+			continue
 
 		draw_line(
 			smooth_points[i],

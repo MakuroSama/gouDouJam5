@@ -14,10 +14,6 @@
 [ext_resource type="PackedScene" uid="uid://cm1ofogty31su" path="res://pork.tscn" id="11_p5x2j"]
 [ext_resource type="PackedScene" uid="uid://lleya3ifbh5j" path="res://salmon.tscn" id="12_yvb8b"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_503qj"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_afvsk"]
-
 [node name="Main" type="Node2D" unique_id=1081906323]
 
 [node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("1_x4av3")]
@@ -45,26 +41,7 @@
 [node name="Salmon" parent="." unique_id=755192589 instance=ExtResource("12_yvb8b")]
 
 [node name="Bag" parent="." unique_id=148969257 instance=ExtResource("1_3mqji")]
-position = Vector2(1459, 224)
-scale = Vector2(0.5, 0.5)
-width = 2000.0
-points = 42
-stiffness = 5000.0
-damping_ratio = 2.0
-maximum_stretch = 1.02
-constraint_strength = 300.0
-link_linear_damping = 4.0
-link_angular_damping = 7.0
-link_mass = 1.5
-
-[node name="RigidBody2D" type="RigidBody2D" parent="." unique_id=272498572]
-position = Vector2(1437, 93)
-collision_layer = 3
-collision_mask = 3
-mass = 0.978
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D" unique_id=1652062955]
-shape = SubResource("CircleShape2D_503qj")
-
-[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D" unique_id=809858464]
-texture = SubResource("PlaceholderTexture2D_afvsk")
+position = Vector2(576, 202)
+scale = Vector2(0.2, 0.2)
+width = 1600.0
+break_threshold = 70.0
