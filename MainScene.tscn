@@ -1,5 +1,40 @@
 [gd_scene format=3 uid="uid://d2si4er2oavfh"]
 
-[node name="Node2D" type="Node2D" unique_id=1081906323]
+[ext_resource type="PackedScene" uid="uid://cpkt0747821ve" path="res://daikon.tscn" id="1_x4av3"]
+[ext_resource type="PackedScene" uid="uid://buv5dd7bdglrl" path="res://cola.tscn" id="2_rpqi1"]
+[ext_resource type="PackedScene" uid="uid://cssr0fg55gr3x" path="res://orange.tscn" id="3_rpqi1"]
+[ext_resource type="PackedScene" uid="uid://cf6dywaya67uy" path="res://sports.tscn" id="4_uxrcv"]
+[ext_resource type="PackedScene" uid="uid://dq72tyole7dw4" path="res://tea.tscn" id="5_rf2cd"]
+[ext_resource type="PackedScene" uid="uid://dfggn7owtolmf" path="res://potato.tscn" id="6_a814b"]
+[ext_resource type="PackedScene" uid="uid://cfnbdcv5e7xny" path="res://negi.tscn" id="7_hbc2u"]
+[ext_resource type="PackedScene" uid="uid://de43nvjidnaya" path="res://broccoli.tscn" id="8_torvr"]
+[ext_resource type="PackedScene" uid="uid://bohxs07kv8dhu" path="res://beef.tscn" id="9_torvr"]
+[ext_resource type="PackedScene" uid="uid://cw7ukhm8n81dc" path="res://chikin.tscn" id="10_8xkvn"]
+[ext_resource type="PackedScene" uid="uid://cm1ofogty31su" path="res://pork.tscn" id="11_p5x2j"]
+[ext_resource type="PackedScene" uid="uid://lleya3ifbh5j" path="res://salmon.tscn" id="12_yvb8b"]
 
-[node name="Node2D" type="Node2D" parent="." unique_id=1568677059]
+[node name="Main" type="Node2D" unique_id=1081906323]
+
+[node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("1_x4av3")]
+
+[node name="Cola" parent="." unique_id=1170558013 instance=ExtResource("2_rpqi1")]
+
+[node name="Orange" parent="." unique_id=24999337 instance=ExtResource("3_rpqi1")]
+
+[node name="Sports" parent="." unique_id=1962389092 instance=ExtResource("4_uxrcv")]
+
+[node name="Tea" parent="." unique_id=761728632 instance=ExtResource("5_rf2cd")]
+
+[node name="Potato" parent="." unique_id=1187822617 instance=ExtResource("6_a814b")]
+
+[node name="Negi" parent="." unique_id=1549638287 instance=ExtResource("7_hbc2u")]
+
+[node name="Broccoli" parent="." unique_id=959037203 instance=ExtResource("8_torvr")]
+
+[node name="Beef" parent="." unique_id=1451232285 instance=ExtResource("9_torvr")]
+
+[node name="Chikin" parent="." unique_id=1187842508 instance=ExtResource("10_8xkvn")]
+
+[node name="Pork" parent="." unique_id=709893473 instance=ExtResource("11_p5x2j")]
+
+[node name="Salmon" parent="." unique_id=755192589 instance=ExtResource("12_yvb8b")]
