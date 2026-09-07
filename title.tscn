@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://diig3jjcb3ca4"]
+
+[ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="1_y7k74"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_oyqm6"]
+font = ExtResource("1_y7k74")
+font_size = 100
+font_color = Color(0, 0, 0, 1)
+
+[node name="Title" type="Control" unique_id=982053829]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="." unique_id=555753779]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 6.0
+offset_right = 1152.0
+offset_bottom = 650.0
+
+[node name="Label" type="Label" parent="." unique_id=1745236023]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -257.0
+offset_top = -236.0
+offset_right = 639.0
+offset_bottom = -99.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "つめつめ"
+label_settings = SubResource("LabelSettings_oyqm6")

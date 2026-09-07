@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://xcwrwlbvj4ai"]
+
+[ext_resource type="Texture2D" uid="uid://bglyswim8ngl3" path="res://Image/allhigh.png" id="1_plv87"]
+
+[node name="Allhigh" type="StaticBody2D" unique_id=1692300567]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=994810275]
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("1_plv87")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1600337271]
+scale = Vector2(0.4, 0.4)
+polygon = PackedVector2Array(-25, -36, -25, 36, 25, 36, 25, -36)

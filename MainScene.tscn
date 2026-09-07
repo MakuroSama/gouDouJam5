@@ -12,6 +12,10 @@
 [ext_resource type="PackedScene" uid="uid://cw7ukhm8n81dc" path="res://chikin.tscn" id="10_8xkvn"]
 [ext_resource type="PackedScene" uid="uid://cm1ofogty31su" path="res://pork.tscn" id="11_p5x2j"]
 [ext_resource type="PackedScene" uid="uid://lleya3ifbh5j" path="res://salmon.tscn" id="12_yvb8b"]
+[ext_resource type="PackedScene" uid="uid://xcwrwlbvj4ai" path="res://allhigh.tscn" id="13_3hf6u"]
+[ext_resource type="PackedScene" uid="uid://b7vehe6clfmac" path="res://sgelf.tscn" id="14_4mcbk"]
+[ext_resource type="PackedScene" uid="uid://28mt7y6e402a" path="res://price.tscn" id="15_mctxq"]
+[ext_resource type="PackedScene" uid="uid://diig3jjcb3ca4" path="res://title.tscn" id="16_nm5af"]
 
 [node name="Main" type="Node2D" unique_id=1081906323]
 
@@ -38,3 +42,11 @@
 [node name="Pork" parent="." unique_id=709893473 instance=ExtResource("11_p5x2j")]
 
 [node name="Salmon" parent="." unique_id=755192589 instance=ExtResource("12_yvb8b")]
+
+[node name="Allhigh" parent="." unique_id=1692300567 instance=ExtResource("13_3hf6u")]
+
+[node name="Sgelf" parent="." unique_id=2063348470 instance=ExtResource("14_4mcbk")]
+
+[node name="Price" parent="." unique_id=2035521385 instance=ExtResource("15_mctxq")]
+
+[node name="Title" parent="." unique_id=982053829 instance=ExtResource("16_nm5af")]
