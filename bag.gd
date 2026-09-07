@@ -11,16 +11,16 @@ class_name Chain
 
 @export var link_scene: PackedScene
 
-@export var width: float = 1600.0
+@export var width: float = 350
 
 @export_range(8, 100, 1)
-var points: int = 24
+var points: int = 16
 
-@export var link_collision_radius: float = 36
+@export var link_collision_radius: float = 32
 
 # Collision circles overlap by this amount.
 @export_range(1.0, 2.0, 0.05)
-var collision_overlap: float = 1.25
+var collision_overlap: float = 1.5
 
 
 # ============================================================
@@ -82,7 +82,7 @@ var maximum_stretch: float = 1.08
 @export_category("Rendering")
 
 @export var draw_bag: bool = true
-@export var bag_line_width: float = 360.0
+@export var bag_line_width: float = 64
 @export var smooth_subdivisions: int = 40
 @export var bag_color: Color = Color(0.15, 0.55, 1.0)
 
