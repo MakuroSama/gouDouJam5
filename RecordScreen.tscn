@@ -61,7 +61,7 @@ grow_horizontal = 2
 theme_override_colors/font_color = Color(0.0941176, 0.356863, 0.47451, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 64
-text = "譛 鬮・險・骭ｲ"
+text = "最 高 記 録"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -96,7 +96,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
-text = "譛鬮倡ｨｼ縺・□鬘・
+text = "稼いだ額"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -105,7 +105,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 58
-text = "ﾂ･ 0"
+text = "¥ 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -124,7 +124,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
-text = "譛螟壼・繧後◆蝠・刀縺ｮ謨ｰ :"
+text = "入れた商品の数 :"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -133,7 +133,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 42
-text = "0 蛟・
+text = "0 個"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -152,7 +152,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
-text = "譛螟夂音驕ｸ縺ｮ謨ｰ :"
+text = "特選の数 :"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -161,7 +161,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 42
-text = "0 蛟・
+text = "0 個"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -180,7 +180,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
-text = "譛螟壻ｽｿ縺｣縺溯｢九・謨ｰ :"
+text = "使った袋の数 :"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -189,7 +189,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 42
-text = "0 譫・
+text = "0 枚"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -217,4 +217,4 @@ theme_override_font_sizes/font_size = 46
 theme_override_styles/normal = SubResource("StyleBoxTexture_btn")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
 theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
-text = "繧ゅ←繧・
+text = "もどる"

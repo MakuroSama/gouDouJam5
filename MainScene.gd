@@ -1,7 +1,7 @@
 extends Node2D
 
 # ==========================================
-# 商品データ定義（全12種類）
+# 商品データ定義（全13種類）
 # ==========================================
 const ITEM_DATA = {
 	"res://daikon.tscn": {"name": "大根", "price": 200, "mass": 0.08},
@@ -16,7 +16,44 @@ const ITEM_DATA = {
 	"res://sports.tscn": {"name": "スポーツ飲料", "price": 170, "mass": 0.35},
 	"res://orange.tscn": {"name": "オレンジジュース", "price": 140, "mass": 0.34},
 	"res://tea.tscn": {"name": "お茶", "price": 100, "mass": 0.35},
+	"res://tamanegi.tscn": {"name": "玉ねぎ", "price": 130, "mass": 0.15},
 }
+
+# ==========================================
+# セット効果定義（倍率降順で優先判定）
+# ==========================================
+const SET_DEFINITIONS = [
+	{
+		"name": "ドリンクバーセット",
+		"items": ["オレンジジュース", "コーラ", "スポーツ飲料", "お茶"],
+		"multiplier": 4.0
+	},
+	{
+		"name": "豚汁セット",
+		"items": ["ジャガイモ", "大根", "ネギ", "豚肉"],
+		"multiplier": 3.0
+	},
+	{
+		"name": "生姜焼きセット",
+		"items": ["玉ねぎ", "豚肉"],
+		"multiplier": 1.5
+	},
+	{
+		"name": "牛丼セット",
+		"items": ["玉ねぎ", "牛肉"],
+		"multiplier": 1.5
+	},
+	{
+		"name": "ネギまセット",
+		"items": ["鶏肉", "ネギ"],
+		"multiplier": 1.5
+	},
+	{
+		"name": "パーティーセット",
+		"items": ["オレンジジュース", "コーラ"],
+		"multiplier": 1.5
+	},
+]
 
 const SPECIAL_STICKER_TEXTURE = preload("res://Image/allhigh.png")
 const ResultScreenClass = preload("res://ResultScreen.gd")
@@ -55,16 +92,18 @@ var grab_offset: Vector2 = Vector2.ZERO
 var last_mouse_pos: Vector2 = Vector2.ZERO
 var mouse_velocity: Vector2 = Vector2.ZERO
 
-# 所持金と袋の中身金額
-const INITIAL_WALLET: int = 10000
-var wallet_money: int = 10000
-var current_bag_price: int = 0
-var total_earned_price: int = 0
+# お金・タイマー・袋
+const INITIAL_PROFIT: int = -10000
+var profit_money: int = INITIAL_PROFIT
+var current_bag_value: int = 0
+var active_sets: Array[String] = []
+var remaining_time: float = 180.0
 
 # 現在袋に入っている商品
 var packed_items: Array[RigidBody2D] = []
 
 @onready var wallet_label: Label = get_node_or_null("HUD/MarginContainer/HBoxContainer/WalletPanel/HBox/WalletLabel")
+@onready var timer_label: Label = get_node_or_null("HUD/TimerPanel/VBox/TimerLabel")
 @onready var price_label: Label = get_node_or_null("Scale/ScalePriceLabel")
 @onready var purchase_button: TextureButton = get_node_or_null("HUD/PurchaseButton")
 
@@ -77,7 +116,7 @@ var bags_used_count: int = 1
 func _ready() -> void:
 	randomize()
 	
-	# ★3種類の袋（小・中・大）からランダムに1つ選んで出現させる！
+	# ランダムな袋で開始
 	var bag_types = BAG_SCENES.keys()
 	var random_type = bag_types.pick_random()
 	change_bag(random_type)
@@ -86,34 +125,120 @@ func _ready() -> void:
 		purchase_button.pressed.connect(_on_purchase_button_pressed)
 	
 	update_wallet_display()
+	_update_timer_display()
 	update_total_price_display()
 	update_purchase_button_state()
 	spawn_shelf_items()
 
-# 所持金表示を更新
+func _process(delta: float) -> void:
+	if is_game_over:
+		return
+	
+	remaining_time -= delta
+	if remaining_time <= 0.0:
+		remaining_time = 0.0
+		_update_timer_display()
+		_on_time_up()
+		return
+		
+	_update_timer_display()
+
+# タイマー表示を更新
+func _update_timer_display() -> void:
+	if timer_label:
+		var sec: int = int(ceil(remaining_time))
+		timer_label.text = "残り %d秒" % sec
+		if sec <= 30:
+			timer_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1))
+		else:
+			timer_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 1))
+
+# お得額表示を更新
 func update_wallet_display() -> void:
 	if wallet_label:
-		wallet_label.text = "¥ " + _format_number(wallet_money)
-		if wallet_money < 0:
-			wallet_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1))
+		var prefix = "+" if profit_money > 0 else ""
+		wallet_label.text = prefix + _format_number(profit_money) + " 円"
+		if profit_money < 0:
+			wallet_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 1))
 		else:
 			wallet_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4, 1))
 
-# 秤の金額表示を更新
+# 秤の金額表示を更新（セット効果発動時はオレンジ色に強調）
 func update_total_price_display() -> void:
 	if price_label:
-		price_label.text = "¥ " + _format_number(current_bag_price)
-		if current_bag_price > wallet_money:
-			price_label.add_theme_color_override("font_color", Color(0.85, 0.15, 0.15, 1))
+		price_label.text = "¥ " + _format_number(current_bag_value)
+		if active_sets.size() > 0:
+			price_label.add_theme_color_override("font_color", Color(0.95, 0.45, 0.05, 1))
 		else:
 			price_label.add_theme_color_override("font_color", Color(0.06, 0.16, 0.25, 1))
 
-# 購入ボタンの状態を更新
+# 購入ボタンの状態を更新（お金がマイナスでなく、袋に商品がある時のみ袋追加・購入可能）
 func update_purchase_button_state() -> void:
 	if purchase_button:
-		var can_purchase = (wallet_money >= current_bag_price) and not is_game_over
+		var projected_profit = profit_money + current_bag_value
+		var can_purchase = (projected_profit >= 0) and (packed_items.size() > 0) and not is_game_over
 		purchase_button.disabled = not can_purchase
 		purchase_button.modulate.a = 1.0 if can_purchase else 0.4
+
+# セット効果と袋の中身の合計金額を計算
+func calculate_bag_value() -> Dictionary:
+	var valid_items: Array[RigidBody2D] = []
+	for it in packed_items:
+		if is_instance_valid(it):
+			valid_items.append(it)
+	packed_items = valid_items
+	
+	var available = valid_items.duplicate()
+	var sets_formed: Array[String] = []
+	var item_multipliers: Dictionary = {}
+	
+	for set_def in SET_DEFINITIONS:
+		while true:
+			var matched_items: Array[RigidBody2D] = []
+			var req_names: Array = set_def["items"].duplicate()
+			var temp_avail = available.duplicate()
+			var all_found = true
+			
+			for req_name in req_names:
+				var found_item: RigidBody2D = null
+				for item in temp_avail:
+					var item_name = item.get_meta("item_name", "")
+					if item_name == req_name:
+						found_item = item
+						break
+				if found_item:
+					temp_avail.erase(found_item)
+					matched_items.append(found_item)
+				else:
+					all_found = false
+					break
+			
+			if all_found:
+				for m_item in matched_items:
+					available.erase(m_item)
+					item_multipliers[m_item] = set_def["multiplier"]
+				sets_formed.append(set_def["name"])
+			else:
+				break
+				
+	var total_value: int = 0
+	for item in valid_items:
+		var base_price: int = item.get_meta("price", 0)
+		var mult: float = item_multipliers.get(item, 1.0)
+		total_value += int(round(base_price * mult))
+		
+	return {
+		"total_value": total_value,
+		"sets": sets_formed
+	}
+
+# 袋の中身を再計算して表示更新
+func _recalculate_bag() -> void:
+	var bag_data = calculate_bag_value()
+	current_bag_value = bag_data["total_value"]
+	active_sets = bag_data["sets"]
+	update_total_price_display()
+	update_purchase_button_state()
 
 # 3桁区切りのフォーマット関数
 func _format_number(n: int) -> String:
@@ -164,7 +289,6 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.collision_mask = 3
 	item.global_position = slot.global_position
 	add_child(item)
-	
 
 	var is_special = randf() < 0.25
 	var final_price: int = calculated_price
@@ -181,6 +305,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.set_meta("price", final_price)
 	item.set_meta("is_special", is_special)
 	item.set_meta("size_scale", size_scale)
+	item.set_meta("item_name", data["name"])
 
 	item.scale = Vector2.ZERO
 	var tween = create_tween()
@@ -191,7 +316,7 @@ func _attach_special_sticker(item: RigidBody2D) -> void:
 	var sticker = Sprite2D.new()
 	sticker.texture = SPECIAL_STICKER_TEXTURE
 	sticker.scale = Vector2(0.25, 0.25)
-	sticker.position = Vector2(15, -15) # 右上寄りに配置
+	sticker.position = Vector2(15, -15)
 	sticker.z_index = 10
 	item.add_child(sticker)
 
@@ -215,7 +340,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			grabbed_item.global_position = event.position + grab_offset
 
 	elif event is InputEventKey and event.pressed and not event.echo:
-		# 数字キー 1, 2, 3 で袋のサイズをリアルタイム切り替え！
 		if event.keycode == KEY_1:
 			change_bag("small")
 		elif event.keycode == KEY_2:
@@ -223,7 +347,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_3:
 			change_bag("big")
 
-# 袋（ヒモのサイズ）をリアルタイムに切り替える
+# 袋を切り替える
 func change_bag(type_name: String) -> void:
 	if not BAG_SCENES.has(type_name):
 		return
@@ -262,60 +386,45 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 			grabbed_item = collider
 			grab_offset = collider.global_position - mouse_pos
 			grabbed_item.freeze = true
-			grabbed_item.z_index = 50 # 掴んでいる間は一番手前に表示
+			grabbed_item.z_index = 50
 			
 			grabbed_item.collision_layer = 0
 			grabbed_item.collision_mask = 0
 			
-			# スロットから持ち出したので値札を薄くする演出
 			var slot_idx = collider.get_meta("slot_index", -1)
 			if slot_idx >= 0 and slot_idx < price_tags.size():
 				price_tags[slot_idx].modulate.a = 0.4
 			break
 
-# 掴んでいた商品を離す（上から投入した時だけ袋に入る！）
+# 掴んでいた商品を離す
 func _release_grabbed_item() -> void:
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.z_index = 5
 		
-		# 手の動きに合わせた慣性速度をつける
 		grabbed_item.linear_velocity = mouse_velocity.clamp(Vector2(-1500, -1500), Vector2(1500, 1500)) * 0.5
 		
 		var slot_idx: int = grabbed_item.get_meta("slot_index", -1)
-
 		var was_in_bag = (grabbed_item in packed_items)
-		if _is_above_bag_opening(grabbed_item.global_position):
 
+		if _is_above_bag_opening(grabbed_item.global_position):
 			grabbed_item.collision_layer = 3
 			grabbed_item.collision_mask = 3
 			
-			# ★袋に入った！秤（袋の中身金額）に加算（所持金は購入ボタン押下時に引かれる）
 			if not was_in_bag:
-				var item_price = grabbed_item.get_meta("price", 0)
-				current_bag_price += item_price
 				packed_items.append(grabbed_item)
+				_recalculate_bag()
 				
-				update_total_price_display()
-				update_purchase_button_state()
-				
-				# 袋に入ったのでスロットの紐付けを解除
 				grabbed_item.set_meta("slot_index", -1)
-				
 				if slot_idx >= 0:
 					get_tree().create_timer(0.4).timeout.connect(func(): spawn_item_at_slot(slot_idx))
 		else:
-		
 			grabbed_item.collision_layer = 4 
 			grabbed_item.collision_mask = 1  
 
-			# 袋から取り出して外へ放出した場合、秤から減額
 			if was_in_bag:
 				packed_items.erase(grabbed_item)
-				var item_price = grabbed_item.get_meta("price", 0)
-				current_bag_price -= item_price
-				update_total_price_display()
-				update_purchase_button_state()
+				_recalculate_bag()
 
 			grabbed_item.set_meta("slot_index", -1)
 			if slot_idx >= 0:
@@ -330,74 +439,90 @@ func _is_above_bag_opening(item_pos: Vector2) -> bool:
 	var bag_node = $Bag
 	var bag_pos = bag_node.global_position
 	var bag_w = bag_node.width if "width" in bag_node else 380.0
-	var half_w = (bag_w * 0.5) + 30.0 # 開口部の横幅（左右マージン付き）
+	var half_w = (bag_w * 0.5) + 30.0
 	
 	var is_in_x = (item_pos.x >= bag_pos.x - half_w) and (item_pos.x <= bag_pos.x + half_w)
 	var is_above_y = item_pos.y <= (bag_pos.y + 30.0)
 	
 	return is_in_x and is_above_y
 
-# 購入ボタン押下時: 所持金から袋の中身金額を支払い、袋を新品・ランダムサイズに交換
+# 購入ボタン押下時: 袋の価値をお得額に加算し、袋を新品・ランダムサイズに交換
 func _on_purchase_button_pressed() -> void:
 	if is_game_over:
 		return
-	if wallet_money < current_bag_price:
-		print("所持金が足りないため、袋を購入できません")
+	if (profit_money + current_bag_value) < 0 or packed_items.is_empty():
+		print("所持金がマイナスのため、袋を追加（購入）できません")
 		return
 		
-	# 購入確定！所持金から袋の中身金額を引く
-	var paid_amount = current_bag_price
-	wallet_money -= paid_amount
-	total_earned_price += paid_amount
+	var bag_val = current_bag_value
+	profit_money += bag_val
 	
-	# 統計データの集計
 	items_packed_count += packed_items.size()
 	for item in packed_items:
 		if is_instance_valid(item) and item.get_meta("is_special", false):
 			special_items_count += 1
 			
-	# 袋の中の商品を片付ける（購入完了して持ち帰り）
 	for item in packed_items:
 		if is_instance_valid(item):
 			item.queue_free()
 	packed_items.clear()
 	
-	# 袋を新品に交換（サイズをランダムに変化させる）
+	# 袋を新品に交換（サイズをランダムに変化）
 	var bag_types = BAG_SCENES.keys()
 	var other_types = bag_types.filter(func(t): return t != current_bag_type)
 	var next_type = other_types.pick_random() if not other_types.is_empty() else bag_types.pick_random()
 	change_bag(next_type)
 	
-	# 袋の中身金額を0にリセット、使った袋の数をカウント
-	current_bag_price = 0
+	current_bag_value = 0
+	active_sets.clear()
 	bags_used_count += 1
 	
 	update_wallet_display()
 	update_total_price_display()
 	update_purchase_button_state()
-	print("★ 袋を購入しました！¥ %d を支払い、残り所持金は ¥ %d です。新袋サイズ: %s" % [paid_amount, wallet_money, next_type])
+	print("★ 袋を追加（購入）しました！+¥ %d 獲得、現在のお得額: ¥ %d" % [bag_val, profit_money])
 
-# 袋破損時の処理（ゲームオーバー演出〜リザルト画面遷移）
+# 袋破損時の処理（ゲームセット）
 func _on_bag_broken() -> void:
 	if is_game_over:
 		return
 	is_game_over = true
 	update_purchase_button_state()
-	print("★ 袋が破れました！リザルト画面へ遷移します")
+	print("★ 袋が破れました！ゲームセット")
 	
-	# 掴んでいた商品を安全に解放
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3
 		grabbed_item.collision_mask = 3
 		grabbed_item = null
 	
-	# リザルト画面に統計データをセット
-	ResultScreenClass.earned_amount = total_earned_price
+	await get_tree().create_timer(1.2).timeout
+	_go_to_result_screen()
+
+# 制限時間終了時の処理（ゲームセット）
+func _on_time_up() -> void:
+	if is_game_over:
+		return
+	is_game_over = true
+	update_purchase_button_state()
+	print("★ 制限時間180秒終了！ゲームセット")
+	
+	# 時間切れ時点で袋が破れていなければ、袋の中身を精算
+	if packed_items.size() > 0:
+		var bag_data = calculate_bag_value()
+		profit_money += bag_data["total_value"]
+		items_packed_count += packed_items.size()
+		for item in packed_items:
+			if is_instance_valid(item) and item.get_meta("is_special", false):
+				special_items_count += 1
+				
+	await get_tree().create_timer(0.8).timeout
+	_go_to_result_screen()
+
+# リザルト画面遷移
+func _go_to_result_screen() -> void:
+	ResultScreenClass.earned_amount = profit_money
 	ResultScreenClass.items_count = items_packed_count
 	ResultScreenClass.special_count = special_items_count
 	ResultScreenClass.bags_count = bags_used_count
-	
-	# 袋が破れて商品がこぼれる様子を少し見せてからリザルト画面へ
-	await get_tree().create_timer(1.2).timeout
 	get_tree().change_scene_to_file("res://ResultScreen.tscn")

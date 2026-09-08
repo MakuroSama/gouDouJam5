@@ -17,7 +17,7 @@ func _ready() -> void:
 	bags_value_label.text = str(records.get("max_bags_count", 0)) + " 枚"
 
 func _format_number(n: int) -> String:
-	var s = str(n)
+	var s = str(abs(n))
 	var res = ""
 	var count = 0
 	for i in range(s.length() - 1, -1, -1):
@@ -25,7 +25,7 @@ func _format_number(n: int) -> String:
 		count += 1
 		if count % 3 == 0 and i > 0:
 			res = "," + res
-	return res
+	return ("-" if n < 0 else "") + res
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://title.tscn")
