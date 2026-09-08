@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://cdmkls12mar3c" path="res://Image/tea.png" id="1_nudgl"]
 
 [node name="Tea" type="RigidBody2D" unique_id=761728632]
+collision_layer = 3
+collision_mask = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1861773]
 scale = Vector2(0.2, 0.2)

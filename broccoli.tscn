@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://0s0ecgma6gh8" path="res://Image/broccoli.png" id="1_vrekp"]
 
 [node name="Broccoli" type="RigidBody2D" unique_id=959037203]
+collision_layer = 3
+collision_mask = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=974672338]
 position = Vector2(2.9999998, 0)
