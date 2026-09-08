@@ -194,7 +194,7 @@ func _destroy_item(item: RigidBody2D) -> void:
 	tween.tween_property(item, "scale", Vector2.ZERO, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(item, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(item.queue_free)
-
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1128250.mp3"))
 # １度袋の中に入ったもの（has_settled_in_bag）が袋から出た場合のみゲームオーバー
 func _check_bag_containment() -> void:
 	if is_game_over or not has_node("Bag"):
@@ -430,7 +430,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.scale = Vector2.ZERO
 	var tween = create_tween()
 	tween.tween_property(item, "scale", Vector2(size_scale, size_scale), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_400832.mp3"))
 # 特選シールを商品に貼り付ける
 func _attach_special_sticker(item: RigidBody2D) -> void:
 	var sticker = Sprite2D.new()
@@ -514,12 +514,12 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 			
 			grabbed_item.collision_layer = 0
 			grabbed_item.collision_mask = 0
-			
+			SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1272928.mp3"))
 			var slot_idx = collider.get_meta("slot_index", -1)
 			if slot_idx >= 0 and slot_idx < price_tags.size():
 				price_tags[slot_idx].modulate.a = 0.4
 			break
-
+	
 # 掴んでいた商品を離す
 func _release_grabbed_item() -> void:
 	if grabbed_item and is_instance_valid(grabbed_item):
@@ -548,6 +548,7 @@ func _release_grabbed_item() -> void:
 			grabbed_item.set_meta("despawn_timer", 3.0)
 			
 		grabbed_item = null
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1283196.mp3"))
 
 func _is_above_bag_opening(item_pos: Vector2) -> bool:
 	if not has_node("Bag"):
@@ -593,7 +594,7 @@ func _on_purchase_button_pressed() -> void:
 	current_bag_value = 0
 	active_sets.clear()
 	bags_used_count += 1
-	
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
 	update_wallet_display()
 	update_total_price_display()
 	update_purchase_button_state()
@@ -606,7 +607,7 @@ func _on_bag_broken() -> void:
 	is_game_over = true
 	update_purchase_button_state()
 	print("★ 袋が破れました！ゲームセット")
-	
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3

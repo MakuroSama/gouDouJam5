@@ -15,6 +15,11 @@ run/main_scene="uid://diig3jjcb3ca4"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+MusicPlayer="*uid://d33ylckl2bt1w"
+SfxPool="*uid://cf0hdw3ucnrg1"
+
 [display]
 
 window/size/viewport_width=1920

@@ -569,7 +569,8 @@ func _physics_process(_delta: float) -> void:
 			var b := links[i + 1]
 
 			var distance := a.global_position.distance_to(b.global_position)
-
+			if distance > break_threshold/1.5:
+				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
 			if distance > break_threshold:
 				_break_joint(i)
 
