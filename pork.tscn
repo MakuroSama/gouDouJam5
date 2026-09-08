@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://qjokjnn5t8ma" path="res://Image/pork.png" id="1_28bec"]
 
 [node name="Pork" type="RigidBody2D" unique_id=709893473]
+collision_layer = 3
+collision_mask = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1336504947]
 scale = Vector2(0.2, 0.2)

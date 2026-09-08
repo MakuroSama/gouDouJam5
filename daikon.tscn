@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://dawf50du2f2xg" path="res://Image/dai.png" id="1_worfi"]
 
 [node name="Daikon" type="RigidBody2D" unique_id=2000708975]
+collision_layer = 3
+collision_mask = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=283682403]
 scale = Vector2(0.2, 0.2)

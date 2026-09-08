@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://d1w8v7ytherjx"]
+
+[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="1_srv1h"]
+
+[node name="Bag" unique_id=148969257 instance=ExtResource("1_srv1h")]
+width = 380.0
+stiffness = 2200.0
+maximum_stretch = 1.04
+constraint_strength = 150.0
+break_threshold = 110.0
