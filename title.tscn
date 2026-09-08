@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://c5baw2ugmp1g8" path="res://title.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="1_y7k74"]
+[ext_resource type="Texture2D" uid="uid://dqsvs5sdpaeyh" path="res://Image/Back.jpg" id="2_mom7w"]
 [ext_resource type="Texture2D" uid="uid://c2rbg1otrvxt4" path="res://Image/rogo.png" id="3_kpexm"]
-[ext_resource type="Texture2D" path="res://Image/button.png" id="4_button_tex"]
+[ext_resource type="Texture2D" uid="uid://dlg2xyal3g2ge" path="res://Image/button.png" id="4_button_tex"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn"]
 texture = ExtResource("4_button_tex")
@@ -44,6 +45,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Back" type="Sprite2D" parent="." unique_id=1161437676]
+position = Vector2(961.5, 604.99994)
+scale = Vector2(1.206875, 1.1289718)
+texture = ExtResource("2_mom7w")
 
 [node name="Rogo" type="Sprite2D" parent="." unique_id=112087360]
 position = Vector2(960, 212)
