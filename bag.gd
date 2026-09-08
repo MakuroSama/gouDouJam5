@@ -1,6 +1,8 @@
 extends Node2D
 class_name Chain
 
+signal bag_broken
+
 # ============================================================
 # BAG
 # ============================================================
@@ -122,6 +124,7 @@ var maximum_stretch: float = 1.08
 var links: Array[RigidBody2D] = []
 var joints: Array[DampedSpringJoint2D] = []
 var broken: Array[bool] = []
+var _is_broken_signaled: bool = false
 # Original distance between neighboring links.
 var rest_distances: Array[float] = []
 
@@ -715,6 +718,10 @@ func _break_joint(
 	var joint := joints[index]
 	if is_instance_valid(joint):
 		joint.queue_free()
+
+	if not _is_broken_signaled:
+		_is_broken_signaled = true
+		bag_broken.emit()
 
 # ============================================================
 # SMOOTH BAG DRAWING
