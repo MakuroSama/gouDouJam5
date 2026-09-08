@@ -13,7 +13,7 @@ func _on_start_button_pressed():
 	get_tree().change_scene_to_file("res://MainScene.tscn")
 
 func _on_record_button_pressed():
-	print("記録ボタンが押されました")
+	get_tree().change_scene_to_file("res://RecordScreen.tscn")
 
 func _on_quit_button_pressed():
 	get_tree().quit()

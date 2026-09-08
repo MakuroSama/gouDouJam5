@@ -3,15 +3,30 @@
 [ext_resource type="Script" path="res://PauseMenu.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://d4mgtlg1eqo55" path="res://Image/gear.png" id="2_gear_tex"]
 [ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="3_font"]
+[ext_resource type="Texture2D" path="res://Image/button.png" id="4_button_tex"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
-bg_color = Color(0.0941176, 0.356863, 0.47451, 1)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 120.0
+texture_margin_top = 25.0
+texture_margin_right = 120.0
+texture_margin_bottom = 25.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.12549, 0.435294, 0.572549, 1)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 120.0
+texture_margin_top = 25.0
+texture_margin_right = 120.0
+texture_margin_bottom = 25.0
+modulate_color = Color(1.08, 1.08, 1.08, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.0705882, 0.27451, 0.368627, 1)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_pressed"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 120.0
+texture_margin_top = 25.0
+texture_margin_right = 120.0
+texture_margin_bottom = 25.0
+modulate_color = Color(0.85, 0.85, 0.85, 1)
 
 [node name="PauseMenu" type="CanvasLayer"]
 process_mode = 3
@@ -66,27 +81,31 @@ theme_override_constants/separation = 30
 alignment = 1
 
 [node name="ResumeButton" type="Button" parent="Overlay/VBoxContainer"]
-custom_minimum_size = Vector2(600, 90)
+custom_minimum_size = Vector2(600, 100)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxFlat_box")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
 text = "ゲームに戻る"
 
 [node name="TitleButton" type="Button" parent="Overlay/VBoxContainer"]
-custom_minimum_size = Vector2(600, 90)
+custom_minimum_size = Vector2(600, 100)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxFlat_box")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
 text = "タイトルに戻る"

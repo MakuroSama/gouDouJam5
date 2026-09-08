@@ -6,6 +6,24 @@
 [ext_resource type="PackedScene" uid="uid://d387h662w3jpl" path="res://PriceTag.tscn" id="4_pricetag_scene"]
 [ext_resource type="Texture2D" uid="uid://dqsvs5sdpaeyh" path="res://Image/Back.jpg" id="5_back_tex"]
 [ext_resource type="PackedScene" uid="uid://b5k8xye2kgl7p" path="res://PauseMenu.tscn" id="6_pause_scene"]
+[ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="7_font"]
+[ext_resource type="Texture2D" path="res://Image/obi.png" id="8_obi_tex"]
+[ext_resource type="Texture2D" path="res://Image/scale.png" id="9_scale_tex"]
+[ext_resource type="Texture2D" path="res://Image/Purchase.png" id="10_purchase_tex"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_panel"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 26.0
+content_margin_bottom = 10.0
+bg_color = Color(0.0941176, 0.356863, 0.47451, 0.95)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(2100, 60)
@@ -16,18 +34,19 @@ size = Vector2(1050, 24)
 [node name="MainScene" type="Node2D" unique_id=1995663294]
 script = ExtResource("1_main_script")
 
-[node name="Background" type="TextureRect" parent="." unique_id=575543239]
+[node name="Background" type="Sprite2D" parent="." unique_id=575543239]
 z_index = -100
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 1920.0
-offset_bottom = 1080.0
-grow_horizontal = 2
-grow_vertical = 2
+position = Vector2(960, 540)
+scale = Vector2(1.2, 1.2)
 texture = ExtResource("5_back_tex")
-expand_mode = 1
-stretch_mode = 6
+
+[node name="FloorExtension" type="Sprite2D" parent="." unique_id=987654321]
+z_index = -100
+position = Vector2(960, 1220)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("5_back_tex")
+region_enabled = true
+region_rect = Rect2(0, 970, 1600, 100)
 
 [node name="FloorStaticBody" type="StaticBody2D" parent="." unique_id=241712913]
 position = Vector2(960, 1070)
@@ -93,6 +112,25 @@ position = Vector2(1170, 945)
 
 [node name="PriceTag5" parent="PriceTags" unique_id=1468512766 instance=ExtResource("4_pricetag_scene")]
 position = Vector2(1710, 945)
+
+[node name="Scale" type="Sprite2D" parent="." unique_id=987654322]
+z_index = -10
+position = Vector2(400, 850)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("9_scale_tex")
+
+[node name="ScalePriceLabel" type="Label" parent="Scale" unique_id=987654323]
+offset_left = -110.0
+offset_top = 1.0
+offset_right = 110.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(0.06, 0.16, 0.25, 1)
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 22
+text = "¥ 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 
 [node name="Bag" parent="." unique_id=10843787 instance=ExtResource("3_bag_scene")]
 position = Vector2(400, 520)
