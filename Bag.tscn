@@ -9,6 +9,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_afvsk"]
 
 [node name="Bag" type="Node2D" unique_id=148969257]
+z_index = 1
 script = ExtResource("1_kksag")
 link_scene = ExtResource("2_cknj3")
 smooth_subdivisions = 16
