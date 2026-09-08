@@ -42,7 +42,9 @@ func _ready() -> void:
 	# 金額のカウントアップ演出
 	if earned_value_label:
 		earned_value_label.text = "¥ 0"
-		if earned_amount > 0:
+		if earned_amount != 0:
+			if earned_amount < 0:
+				earned_value_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 1))
 			var tween = create_tween()
 			tween.tween_method(
 				func(val: int):
@@ -56,7 +58,7 @@ func _ready() -> void:
 
 # 3桁区切りのフォーマット関数
 func _format_number(n: int) -> String:
-	var s = str(n)
+	var s = str(abs(n))
 	var res = ""
 	var count = 0
 	for i in range(s.length() - 1, -1, -1):
@@ -64,7 +66,7 @@ func _format_number(n: int) -> String:
 		count += 1
 		if count % 3 == 0 and i > 0:
 			res = "," + res
-	return res
+	return ("-" if n < 0 else "") + res
 
 func _on_replay_pressed() -> void:
 	get_tree().change_scene_to_file("res://MainScene.tscn")
