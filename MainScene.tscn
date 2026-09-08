@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dmruj8caaownc" path="res://Image/obi.png" id="8_obi_tex"]
 [ext_resource type="Texture2D" uid="uid://kqq7hgm44fxr" path="res://Image/scale.png" id="9_scale_tex"]
 [ext_resource type="Texture2D" uid="uid://c5nu3dw02pe13" path="res://Image/Purchase.png" id="10_purchase_tex"]
+[ext_resource type="Texture2D" uid="uid://cg7bpnmufs2n0" path="res://Image/nc406699_ziperbag.png" id="11_ziperbag_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(2100, 60)
@@ -30,6 +31,23 @@ corner_radius_bottom_left = 12
 shadow_color = Color(0, 0, 0, 0.25)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_box"]
+bg_color = Color(0.22, 0.24, 0.26, 0.96)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 12
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
+bg_color = Color(0.35, 0.38, 0.42, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="MainScene" type="Node2D" unique_id=1995663294]
 script = ExtResource("1_main_script")
@@ -114,8 +132,8 @@ position = Vector2(1170, 945)
 position = Vector2(1710, 945)
 
 [node name="Scale" type="Sprite2D" parent="." unique_id=987654322]
-z_index = -10
-position = Vector2(400, 850)
+z_index = 20
+position = Vector2(408, 901)
 scale = Vector2(1.2, 1.2)
 texture = ExtResource("9_scale_tex")
 
@@ -225,14 +243,14 @@ vertical_alignment = 1
 
 [node name="PurchaseButton" type="TextureButton" parent="HUD" unique_id=2084990826]
 offset_left = 275.0
-offset_top = 955.0
+offset_top = 990.0
 offset_right = 525.0
-offset_bottom = 1065.0
+offset_bottom = 1100.0
 texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="BagShopPanel" type="ColorRect" parent="HUD"]
+[node name="BagShopPanel" type="ColorRect" parent="HUD" unique_id=1754579854]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
@@ -241,8 +259,8 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
-[node name="ShopBox" type="Panel" parent="HUD/BagShopPanel"]
-anchors_preset = 8
+[node name="ShopBox" type="Panel" parent="HUD/BagShopPanel" unique_id=2014345108]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -255,7 +273,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_shop_box")
 
-[node name="CloseButton" type="Button" parent="HUD/BagShopPanel/ShopBox"]
+[node name="CloseButton" type="Button" parent="HUD/BagShopPanel/ShopBox" unique_id=1617031589]
+layout_mode = 0
 offset_left = 1440.0
 offset_top = 18.0
 offset_right = 1570.0
@@ -265,14 +284,14 @@ theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
 text = "✕ 閉じる"
 
-[node name="ColSmall" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+[node name="ColSmall" type="Control" parent="HUD/BagShopPanel/ShopBox" unique_id=620327332]
 anchors_preset = 0
 offset_left = 60.0
 offset_top = 40.0
 offset_right = 500.0
 offset_bottom = 680.0
 
-[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColSmall" unique_id=665893259]
 layout_mode = 0
 offset_left = 120.0
 offset_top = 130.0
@@ -282,7 +301,7 @@ texture = ExtResource("11_ziperbag_tex")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall" unique_id=2053951633]
 layout_mode = 0
 offset_left = 120.0
 offset_top = 220.0
@@ -297,7 +316,7 @@ text = "小"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall" unique_id=1857897004]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 410.0
@@ -312,7 +331,7 @@ text = "価　格: 10000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall" unique_id=245819956]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 465.0
@@ -327,7 +346,7 @@ text = "制限時間:　+10秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BuySmallButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+[node name="BuySmallButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColSmall" unique_id=1895024000]
 layout_mode = 0
 offset_left = 125.0
 offset_top = 535.0
@@ -337,14 +356,14 @@ texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ColMiddle" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+[node name="ColMiddle" type="Control" parent="HUD/BagShopPanel/ShopBox" unique_id=672575778]
 anchors_preset = 0
 offset_left = 580.0
 offset_top = 40.0
 offset_right = 1020.0
 offset_bottom = 680.0
 
-[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColMiddle" unique_id=1355899129]
 layout_mode = 0
 offset_left = 95.0
 offset_top = 80.0
@@ -354,7 +373,7 @@ texture = ExtResource("11_ziperbag_tex")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle" unique_id=383606974]
 layout_mode = 0
 offset_left = 95.0
 offset_top = 200.0
@@ -369,7 +388,7 @@ text = "中"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle" unique_id=1789514345]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 410.0
@@ -384,7 +403,7 @@ text = "価　格: 20000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle" unique_id=1027369023]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 465.0
@@ -399,7 +418,7 @@ text = "制限時間:　+20秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BuyMiddleButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+[node name="BuyMiddleButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColMiddle" unique_id=791089898]
 layout_mode = 0
 offset_left = 125.0
 offset_top = 535.0
@@ -409,14 +428,14 @@ texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ColBig" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+[node name="ColBig" type="Control" parent="HUD/BagShopPanel/ShopBox" unique_id=1463997050]
 anchors_preset = 0
 offset_left = 1100.0
 offset_top = 40.0
 offset_right = 1540.0
 offset_bottom = 680.0
 
-[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColBig" unique_id=141321383]
 layout_mode = 0
 offset_left = 75.0
 offset_top = 30.0
@@ -426,7 +445,7 @@ texture = ExtResource("11_ziperbag_tex")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig" unique_id=2428380]
 layout_mode = 0
 offset_left = 75.0
 offset_top = 180.0
@@ -441,7 +460,7 @@ text = "大"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig" unique_id=1869357903]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 410.0
@@ -456,7 +475,7 @@ text = "価　格: 30000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig" unique_id=824131810]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 465.0
@@ -471,7 +490,7 @@ text = "制限時間:　+30秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BuyBigButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+[node name="BuyBigButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColBig" unique_id=1230861157]
 layout_mode = 0
 offset_left = 125.0
 offset_top = 535.0
@@ -480,4 +499,3 @@ offset_bottom = 620.0
 texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
-
