@@ -155,8 +155,12 @@ func _ready() -> void:
 	_connect_hooks()
 
 	queue_redraw()
-
-
+	for child in links[0].get_children():
+		if child is CollisionShape2D or child is CollisionPolygon2D:
+			child.disabled = true
+	for child in links[links.size()-1].get_children():
+		if child is CollisionShape2D or child is CollisionPolygon2D:
+			child.disabled = true
 # ============================================================
 # CREATE LINK
 # ============================================================
@@ -354,7 +358,7 @@ func _create_spring(
 	rest_distances.append(distance)
 	broken.append(false) 
 	var joint := DampedSpringJoint2D.new()
-
+	
 	add_child(joint)
 
 	joint.global_position = (
@@ -367,7 +371,7 @@ func _create_spring(
 
 	# Neighboring links must not collide with one another.
 	joint.disable_collision = true
-
+	
 	joint.length = distance
 	joint.rest_length = distance
 
