@@ -7,27 +7,15 @@
 [ext_resource type="Texture2D" uid="uid://dqsvs5sdpaeyh" path="res://Image/Back.jpg" id="5_back_tex"]
 [ext_resource type="PackedScene" uid="uid://b5k8xye2kgl7p" path="res://PauseMenu.tscn" id="6_pause_scene"]
 [ext_resource type="FontFile" uid="uid://dtg6j5gt25ag6" path="res://Font/HGRPP1.TTC" id="7_font"]
-[ext_resource type="Texture2D" path="res://Image/obi.png" id="8_obi_tex"]
-[ext_resource type="Texture2D" path="res://Image/scale.png" id="9_scale_tex"]
-[ext_resource type="Texture2D" path="res://Image/Purchase.png" id="10_purchase_tex"]
-[ext_resource type="Texture2D" uid="uid://cg7bpnmufs2n0" path="res://Image/nc406699_ziperbag.png" id="11_ziperbag_tex"]
+[ext_resource type="Texture2D" uid="uid://dmruj8caaownc" path="res://Image/obi.png" id="8_obi_tex"]
+[ext_resource type="Texture2D" uid="uid://kqq7hgm44fxr" path="res://Image/scale.png" id="9_scale_tex"]
+[ext_resource type="Texture2D" uid="uid://c5nu3dw02pe13" path="res://Image/Purchase.png" id="10_purchase_tex"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_box"]
-bg_color = Color(0.22, 0.24, 0.26, 0.96)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 12
-shadow_offset = Vector2(0, 4)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2100, 60)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
-bg_color = Color(0.35, 0.38, 0.42, 0.9)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf_tier"]
+size = Vector2(1050, 24)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_panel"]
 content_margin_left = 22.0
@@ -42,12 +30,6 @@ corner_radius_bottom_left = 12
 shadow_color = Color(0, 0, 0, 0.25)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(2100, 60)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf_tier"]
-size = Vector2(1050, 24)
 
 [node name="MainScene" type="Node2D" unique_id=1995663294]
 script = ExtResource("1_main_script")
@@ -149,7 +131,6 @@ text = "¥ 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-
 [node name="Bag" parent="." unique_id=10843787 instance=ExtResource("3_bag_scene")]
 position = Vector2(400, 520)
 width = 380.0
@@ -161,10 +142,10 @@ smooth_subdivisions = 4
 
 [node name="PauseMenu" parent="." unique_id=1567808325 instance=ExtResource("6_pause_scene")]
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=392330762]
 layer = 50
 
-[node name="ObiBanner" type="TextureRect" parent="HUD"]
+[node name="ObiBanner" type="TextureRect" parent="HUD" unique_id=1480080323]
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 120.0
@@ -173,26 +154,26 @@ texture = ExtResource("8_obi_tex")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=282310870]
 offset_left = 35.0
 offset_top = 20.0
 offset_right = 750.0
 offset_bottom = 95.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer" unique_id=162422205]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="WalletPanel" type="PanelContainer" parent="HUD/MarginContainer/HBoxContainer"]
+[node name="WalletPanel" type="PanelContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=682229913]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="HBox" type="HBoxContainer" parent="HUD/MarginContainer/HBoxContainer/WalletPanel"]
+[node name="HBox" type="HBoxContainer" parent="HUD/MarginContainer/HBoxContainer/WalletPanel" unique_id=1210499182]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox"]
+[node name="TitleLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox" unique_id=47851944]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("7_font")
@@ -200,15 +181,15 @@ theme_override_font_sizes/font_size = 28
 text = "お得"
 vertical_alignment = 1
 
-[node name="WalletLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox"]
+[node name="WalletLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox" unique_id=1987640839]
 layout_mode = 2
-theme_override_colors/font_color = Color(1.0, 0.4, 0.4, 1)
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 32
 text = "-10000 円"
 vertical_alignment = 1
 
-[node name="TimerPanel" type="PanelContainer" parent="HUD"]
+[node name="TimerPanel" type="PanelContainer" parent="HUD" unique_id=1148757947]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -219,12 +200,12 @@ offset_bottom = 105.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/TimerPanel"]
+[node name="VBox" type="VBoxContainer" parent="HUD/TimerPanel" unique_id=1341187742]
 layout_mode = 2
 theme_override_constants/separation = 2
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="HUD/TimerPanel/VBox"]
+[node name="TitleLabel" type="Label" parent="HUD/TimerPanel/VBox" unique_id=390944365]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("7_font")
@@ -233,7 +214,7 @@ text = "制限時間"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="HUD/TimerPanel/VBox"]
+[node name="TimerLabel" type="Label" parent="HUD/TimerPanel/VBox" unique_id=1446809194]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
 theme_override_fonts/font = ExtResource("7_font")
@@ -242,7 +223,7 @@ text = "残り 180秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PurchaseButton" type="TextureButton" parent="HUD"]
+[node name="PurchaseButton" type="TextureButton" parent="HUD" unique_id=2084990826]
 offset_left = 275.0
 offset_top = 955.0
 offset_right = 525.0
