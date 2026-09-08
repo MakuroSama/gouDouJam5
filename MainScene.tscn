@@ -231,3 +231,253 @@ offset_bottom = 1065.0
 texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="BagShopPanel" type="ColorRect" parent="HUD"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="ShopBox" type="Panel" parent="HUD/BagShopPanel"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -800.0
+offset_top = -360.0
+offset_right = 800.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_shop_box")
+
+[node name="CloseButton" type="Button" parent="HUD/BagShopPanel/ShopBox"]
+offset_left = 1440.0
+offset_top = 18.0
+offset_right = 1570.0
+offset_bottom = 62.0
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
+text = "✕ 閉じる"
+
+[node name="ColSmall" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+anchors_preset = 0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = 500.0
+offset_bottom = 680.0
+
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 130.0
+offset_right = 320.0
+offset_bottom = 380.0
+texture = ExtResource("11_ziperbag_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 220.0
+offset_right = 320.0
+offset_bottom = 290.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 54
+text = "小"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 410.0
+offset_right = 420.0
+offset_bottom = 460.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "価　格: 10000円"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 465.0
+offset_right = 420.0
+offset_bottom = 515.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "制限時間:　+10秒"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BuySmallButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColSmall"]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 535.0
+offset_right = 315.0
+offset_bottom = 620.0
+texture_normal = ExtResource("10_purchase_tex")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ColMiddle" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+anchors_preset = 0
+offset_left = 580.0
+offset_top = 40.0
+offset_right = 1020.0
+offset_bottom = 680.0
+
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+layout_mode = 0
+offset_left = 95.0
+offset_top = 80.0
+offset_right = 345.0
+offset_bottom = 380.0
+texture = ExtResource("11_ziperbag_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+layout_mode = 0
+offset_left = 95.0
+offset_top = 200.0
+offset_right = 345.0
+offset_bottom = 275.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 60
+text = "中"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 410.0
+offset_right = 420.0
+offset_bottom = 460.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "価　格: 20000円"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 465.0
+offset_right = 420.0
+offset_bottom = 515.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "制限時間:　+20秒"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BuyMiddleButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColMiddle"]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 535.0
+offset_right = 315.0
+offset_bottom = 620.0
+texture_normal = ExtResource("10_purchase_tex")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ColBig" type="Control" parent="HUD/BagShopPanel/ShopBox"]
+anchors_preset = 0
+offset_left = 1100.0
+offset_top = 40.0
+offset_right = 1540.0
+offset_bottom = 680.0
+
+[node name="BagImage" type="TextureRect" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 30.0
+offset_right = 365.0
+offset_bottom = 380.0
+texture = ExtResource("11_ziperbag_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SizeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 180.0
+offset_right = 365.0
+offset_bottom = 260.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 64
+text = "大"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 410.0
+offset_right = 420.0
+offset_bottom = 460.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "価　格: 30000円"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 465.0
+offset_right = 420.0
+offset_bottom = 515.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 36
+text = "制限時間:　+30秒"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BuyBigButton" type="TextureButton" parent="HUD/BagShopPanel/ShopBox/ColBig"]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 535.0
+offset_right = 315.0
+offset_bottom = 620.0
+texture_normal = ExtResource("10_purchase_tex")
+ignore_texture_size = true
+stretch_mode = 5
+

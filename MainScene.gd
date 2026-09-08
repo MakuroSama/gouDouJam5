@@ -65,6 +65,13 @@ const BAG_SCENES = {
 	"big": preload("res://BigBag.tscn"),
 }
 
+# 袋ショップの価格・制限時間データ
+const BAG_SHOP_DATA = {
+	"small": {"name": "小", "price": 10000, "time_bonus": 10.0},
+	"middle": {"name": "中", "price": 20000, "time_bonus": 20.0},
+	"big": {"name": "大", "price": 30000, "time_bonus": 30.0},
+}
+
 var current_bag_type: String = "middle"
 
 # スロット位置（上段左右、中段左右、下段左右）
@@ -106,6 +113,11 @@ var packed_items: Array[RigidBody2D] = []
 @onready var timer_label: Label = get_node_or_null("HUD/TimerPanel/VBox/TimerLabel")
 @onready var price_label: Label = get_node_or_null("Scale/ScalePriceLabel")
 @onready var purchase_button: TextureButton = get_node_or_null("HUD/PurchaseButton")
+@onready var bag_shop_panel: Control = get_node_or_null("HUD/BagShopPanel")
+@onready var buy_small_btn: TextureButton = get_node_or_null("HUD/BagShopPanel/ShopBox/ColSmall/BuySmallButton")
+@onready var buy_middle_btn: TextureButton = get_node_or_null("HUD/BagShopPanel/ShopBox/ColMiddle/BuyMiddleButton")
+@onready var buy_big_btn: TextureButton = get_node_or_null("HUD/BagShopPanel/ShopBox/ColBig/BuyBigButton")
+@onready var shop_close_btn: Button = get_node_or_null("HUD/BagShopPanel/ShopBox/CloseButton")
 
 # ゲームオーバー状態と統計
 var is_game_over: bool = false
@@ -116,13 +128,21 @@ var closeToEnd = false
 func _ready() -> void:
 	randomize()
 	
-	# ランダムな袋で開始
-	var bag_types = BAG_SCENES.keys()
-	var random_type = bag_types.pick_random()
-	change_bag(random_type)
+	# 一番最初の袋は中サイズとする
+	change_bag("middle")
 	
 	if purchase_button:
-		purchase_button.pressed.connect(_on_purchase_button_pressed)
+		purchase_button.pressed.connect(open_bag_shop)
+		
+	if shop_close_btn:
+		shop_close_btn.pressed.connect(close_bag_shop)
+		
+	if buy_small_btn:
+		buy_small_btn.pressed.connect(func(): buy_bag("small"))
+	if buy_middle_btn:
+		buy_middle_btn.pressed.connect(func(): buy_bag("middle"))
+	if buy_big_btn:
+		buy_big_btn.pressed.connect(func(): buy_bag("big"))
 	
 	update_wallet_display()
 	_update_timer_display()
@@ -142,9 +162,10 @@ func _is_inside_bag_cavity(item_pos: Vector2) -> bool:
 	var bag_pos = bag_node.global_position
 	var bag_w = bag_node.width if "width" in bag_node else 380.0
 	var half_w = (bag_w * 0.5)
+	var bag_bottom = bag_pos.y + half_w + 30.0
 	
 	var in_x = abs(item_pos.x - bag_pos.x) < (half_w - 10.0)
-	var in_y = (item_pos.y >= bag_pos.y + 10.0) and (item_pos.y <= 855.0)
+	var in_y = (item_pos.y >= bag_pos.y - 15.0) and (item_pos.y <= bag_bottom)
 	return in_x and in_y
 
 # アイテムを袋に正式登録（内部に入った商品のみ）
@@ -161,8 +182,15 @@ func _register_item_in_bag(item: RigidBody2D) -> void:
 	_recalculate_bag()
 	print("★ 商品が袋に入りました: ", item.get_meta("item_name", "商品"))
 
-# スポナーから離れたアイテムの管理（飛行中の袋イン判定、および袋外アイテムの3秒後デストロイ）
+# スポナーから離れたアイテムの管理（飛行中の袋イン判定、および袋外アイテムの管理）
 func _check_outside_bag_items(delta: float) -> void:
+	if not has_node("Bag"):
+		return
+	var bag_node = $Bag
+	var bag_pos = bag_node.global_position
+	var bag_w = bag_node.width if "width" in bag_node else 380.0
+	var half_w = (bag_w * 0.5)
+	
 	for child in get_children():
 		if child is RigidBody2D and child.has_meta("price"):
 			if child == grabbed_item:
@@ -173,12 +201,30 @@ func _check_outside_bag_items(delta: float) -> void:
 			if child.freeze and child.get_meta("slot_index", -1) >= 0:
 				continue
 				
-			# 投げ飛ばされて落下中のアイテムが袋の内部に入ったかチェック
-			if _is_inside_bag_cavity(child.global_position) and child.linear_velocity.y > -20.0:
-				_register_item_in_bag(child)
+			# 投げ飛ばされて落下中のアイテムが袋の内部に入り、静止・安定したかチェック
+			if _is_inside_bag_cavity(child.global_position):
+				# 横方向や全体に高速で飛んでいる最中（通過中）は絶対に袋に登録しない
+				if abs(child.linear_velocity.x) < 80.0 and child.linear_velocity.length() < 150.0:
+					var settle_time: float = child.get_meta("settle_time", 0.0) + delta
+					child.set_meta("settle_time", settle_time)
+					if settle_time >= 0.15 or child.linear_velocity.length() < 35.0:
+						_register_item_in_bag(child)
+						continue
+				else:
+					child.set_meta("settle_time", 0.0)
 				continue
 				
-			# 袋に入らなかったアイテム: 約3秒後にデストロイ（※ゲームオーバーにはならない）
+			# ★袋より上にあるオブジェクトは時間経過でも消えないようにする
+			if child.global_position.y <= (bag_pos.y + 35.0):
+				if child.has_meta("despawn_timer"):
+					child.remove_meta("despawn_timer")
+				# 袋の開口部付近に堆積してほぼ静止している場合は袋に登録
+				if abs(child.global_position.x - bag_pos.x) < (half_w + 15.0):
+					if child.linear_velocity.length() < 40.0:
+						_register_item_in_bag(child)
+				continue
+				
+			# 袋に入らなかったアイテム: 約3秒後にデストロイ（※外に落としたミス時はゲームオーバーにならない）
 			var timer: float = child.get_meta("despawn_timer", 3.0) - delta
 			child.set_meta("despawn_timer", timer)
 			if timer <= 0.0:
@@ -194,8 +240,10 @@ func _destroy_item(item: RigidBody2D) -> void:
 	tween.tween_property(item, "scale", Vector2.ZERO, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(item, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(item.queue_free)
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1128250.mp3"))
-# １度袋の中に入ったもの（has_settled_in_bag）が袋から出た場合のみゲームオーバー
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1128250.mp3"))
+
+# １度袋の中に入ったもの（has_settled_in_bag）が袋から落ちた／こぼれ出た場合のみゲームオーバー
 func _check_bag_containment() -> void:
 	if is_game_over or not has_node("Bag"):
 		return
@@ -204,6 +252,7 @@ func _check_bag_containment() -> void:
 	var bag_pos = bag_node.global_position
 	var bag_w = bag_node.width if "width" in bag_node else 380.0
 	var half_w = (bag_w * 0.5)
+	var bag_bottom = bag_pos.y + half_w + 35.0
 
 	for item in packed_items:
 		if not is_instance_valid(item):
@@ -216,14 +265,16 @@ func _check_bag_containment() -> void:
 		var pos = item.global_position
 		var escaped = false
 		
-		# 1. 左右にはみ出して袋の外へこぼれ落ちた
-		if abs(pos.x - bag_pos.x) > (half_w + 35.0):
+		# 【少しはみ出ている程度（大根やネギの先端など）ではゲームオーバーにしない】
+		# オブジェクトが完全に袋からこぼれ落ちて落下した時のみゲームオーバーとする
+		# 1. 袋の下方へ完全に抜け落ちて床に向かって落下した（袋の最大伸縮よりも遥か下）
+		if pos.y >= 880.0:
 			escaped = true
-		# 2. 下に突き抜けて袋の外へこぼれた（底抜け・床落下）
-		elif pos.y > 865.0:
+		# 2. 横側へ完全に転がり落ちて空中に放り出され、下へ落下中
+		elif abs(pos.x - bag_pos.x) > (half_w + 120.0) and pos.y > (bag_pos.y + 60.0) and item.linear_velocity.y > 60.0:
 			escaped = true
-		# 3. 袋の口から上へ飛び出して外へこぼれ出た
-		elif (pos.y < bag_pos.y - 15.0) and (abs(pos.x - bag_pos.x) > half_w):
+		# 3. 袋の横幅から完全に大きく逸脱した
+		elif abs(pos.x - bag_pos.x) > (half_w + 160.0):
 			escaped = true
 			
 		if escaped:
@@ -235,10 +286,14 @@ func _on_item_escaped_bag(item: RigidBody2D) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	close_bag_shop()
 	update_purchase_button_state()
 	var item_name = item.get_meta("item_name", "商品")
 	print("★ 袋の中に入っていた%sが袋からこぼれ出ました！ゲームオーバー" % item_name)
 	
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+		
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3
@@ -299,10 +354,11 @@ func update_total_price_display() -> void:
 # 購入ボタンの状態を更新
 func update_purchase_button_state() -> void:
 	if purchase_button:
-		var projected_profit = profit_money + current_bag_value
-		var can_purchase = (projected_profit >= 0) and (packed_items.size() > 0) and not is_game_over
-		purchase_button.disabled = not can_purchase
-		purchase_button.modulate.a = 1.0 if can_purchase else 0.4
+		var can_open = (packed_items.size() > 0 or profit_money >= 10000) and not is_game_over
+		purchase_button.disabled = not can_open
+		purchase_button.modulate.a = 1.0 if can_open else 0.4
+	if bag_shop_panel and bag_shop_panel.visible:
+		update_shop_buttons()
 
 # セット効果と袋の中身の合計金額を計算
 func calculate_bag_value() -> Dictionary:
@@ -411,6 +467,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.freeze = true
 	item.collision_layer = 3
 	item.collision_mask = 3
+	item.continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
 	item.global_position = slot.global_position
 	add_child(item)
 
@@ -434,7 +491,8 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.scale = Vector2.ZERO
 	var tween = create_tween()
 	tween.tween_property(item, "scale", Vector2(size_scale, size_scale), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_400832.mp3"))
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_400832.mp3"))
 # 特選シールを商品に貼り付ける
 func _attach_special_sticker(item: RigidBody2D) -> void:
 	var sticker = Sprite2D.new()
@@ -464,7 +522,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			grabbed_item.global_position = event.position + grab_offset
 
 	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_1:
+		if event.keycode == KEY_ESCAPE and bag_shop_panel and bag_shop_panel.visible:
+			close_bag_shop()
+			get_viewport().set_input_as_handled()
+			return
+		elif event.keycode == KEY_1:
 			change_bag("small")
 		elif event.keycode == KEY_2:
 			change_bag("middle")
@@ -494,7 +556,7 @@ func change_bag(type_name: String) -> void:
 
 # マウス位置にある商品を掴む
 func _try_grab_item(mouse_pos: Vector2) -> void:
-	if is_game_over:
+	if is_game_over or (bag_shop_panel and bag_shop_panel.visible):
 		return
 		
 	var space_state = get_world_2d().direct_space_state
@@ -518,7 +580,8 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 			
 			grabbed_item.collision_layer = 0
 			grabbed_item.collision_mask = 0
-			SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1272928.mp3"))
+			if SfxPool:
+				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1272928.mp3"))
 			var slot_idx = collider.get_meta("slot_index", -1)
 			if slot_idx >= 0 and slot_idx < price_tags.size():
 				price_tags[slot_idx].modulate.a = 0.4
@@ -544,40 +607,70 @@ func _release_grabbed_item() -> void:
 			if tree:
 				tree.create_timer(0.4).timeout.connect(func(): spawn_item_at_slot(slot_idx))
 
-		# 手を離した瞬間に既に袋の内部に入っている場合
-		if _is_inside_bag_cavity(grabbed_item.global_position):
+		# 手を離した瞬間に既に袋の内部に入っており、かつ投げ飛ばされていない（手で静かに置かれた）場合のみ即時登録
+		if _is_inside_bag_cavity(grabbed_item.global_position) and mouse_velocity.length() < 120.0:
 			_register_item_in_bag(grabbed_item)
 		else:
-			# 投げ飛ばされた/袋の外で離された場合: 3秒のデスポーンタイマーを設定（飛行・落下中はゲームオーバーにならない）
-			grabbed_item.set_meta("despawn_timer", 3.0)
+			# ★袋より上にあるオブジェクトは時間経過で消えないようにする
+			var bag_node = get_node_or_null("Bag")
+			var bag_y = bag_node.global_position.y if bag_node else 520.0
+			if grabbed_item.global_position.y <= (bag_y + 35.0):
+				if grabbed_item.has_meta("despawn_timer"):
+					grabbed_item.remove_meta("despawn_timer")
+			else:
+				# 袋の外・下で離された場合: 3秒のデスポーンタイマーを設定
+				grabbed_item.set_meta("despawn_timer", 3.0)
 			
 		grabbed_item = null
-		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1283196.mp3"))
+		if SfxPool:
+			SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1283196.mp3"))
 
-func _is_above_bag_opening(item_pos: Vector2) -> bool:
-	if not has_node("Bag"):
-		return false
-		
-	var bag_node = $Bag
-	var bag_pos = bag_node.global_position
-	var bag_w = bag_node.width if "width" in bag_node else 380.0
-	var half_w = (bag_w * 0.5) + 30.0
-	
-	var is_in_x = (item_pos.x >= bag_pos.x - half_w) and (item_pos.x <= bag_pos.x + half_w)
-	var is_above_y = item_pos.y <= (bag_pos.y + 30.0)
-	
-	return is_in_x and is_above_y
+# 袋購入ショップ画面を開く
+func open_bag_shop() -> void:
+	if is_game_over or not bag_shop_panel:
+		return
+	update_shop_buttons()
+	bag_shop_panel.visible = true
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_400832.mp3"))
 
-# 購入ボタン押下時: 袋の価値をお得額に加算し、袋を新品・ランダムサイズに交換
-func _on_purchase_button_pressed() -> void:
-	if is_game_over:
-		return
-	if (profit_money + current_bag_value) < 0 or packed_items.is_empty():
-		print("所持金がマイナスのため、袋を追加（購入）できません")
+# 袋購入ショップ画面を閉じる
+func close_bag_shop() -> void:
+	if bag_shop_panel:
+		bag_shop_panel.visible = false
+
+# ショップ内の各購入ボタンの状態を更新
+func update_shop_buttons() -> void:
+	var total_available = profit_money + current_bag_value
+	var btns = {
+		"small": buy_small_btn,
+		"middle": buy_middle_btn,
+		"big": buy_big_btn,
+	}
+	for btype in btns:
+		var btn = btns[btype]
+		if btn:
+			var price = BAG_SHOP_DATA[btype]["price"]
+			var can_afford = (total_available >= price) and not is_game_over
+			btn.disabled = not can_afford
+			btn.modulate.a = 1.0 if can_afford else 0.4
+
+# 指定サイズの袋を購入
+func buy_bag(bag_type: String) -> void:
+	if is_game_over or not BAG_SHOP_DATA.has(bag_type):
 		return
 		
-	var bag_val = current_bag_value
-	profit_money += bag_val
+	var data = BAG_SHOP_DATA[bag_type]
+	var cost: int = data["price"]
+	var total_available: int = profit_money + current_bag_value
+	
+	if total_available < cost:
+		print("所持金が足りません（必要: %d, 現在: %d）" % [cost, total_available])
+		return
+		
+	# 秤の商品の精算とお金の支払い
+	profit_money = total_available - cost
+	remaining_time += data["time_bonus"]
 	
 	items_packed_count += packed_items.size()
 	for item in packed_items:
@@ -589,29 +682,33 @@ func _on_purchase_button_pressed() -> void:
 			item.queue_free()
 	packed_items.clear()
 	
-	# 袋を新品に交換（サイズをランダムに変化）
-	var bag_types = BAG_SCENES.keys()
-	var other_types = bag_types.filter(func(t): return t != current_bag_type)
-	var next_type = other_types.pick_random() if not other_types.is_empty() else bag_types.pick_random()
-	change_bag(next_type)
+	# 指定したサイズの袋に交換
+	change_bag(bag_type)
 	
 	current_bag_value = 0
 	active_sets.clear()
 	bags_used_count += 1
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
+	
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
+		
+	close_bag_shop()
 	update_wallet_display()
+	_update_timer_display()
 	update_total_price_display()
 	update_purchase_button_state()
-	print("★ 袋を追加（購入）しました！+¥ %d 獲得、現在のお得額: ¥ %d" % [bag_val, profit_money])
+	print("★ %sサイズの袋を購入しました！（残金: ¥%d, 残り時間: +%.0f秒）" % [data["name"], profit_money, data["time_bonus"]])
 
 # 袋破損時の処理（ゲームセット）
 func _on_bag_broken() -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	close_bag_shop()
 	update_purchase_button_state()
 	print("★ 袋が破れました！ゲームセット")
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3
@@ -628,6 +725,7 @@ func _on_time_up() -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	close_bag_shop()
 	update_purchase_button_state()
 	print("★ 制限時間180秒終了！ゲームセット")
 	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1385435.mp3"))

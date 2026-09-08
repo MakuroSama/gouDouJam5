@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-MusicPlayer="*uid://d33ylckl2bt1w"
-SfxPool="*uid://cf0hdw3ucnrg1"
+MusicPlayer="*res://MusicPlayer.gd"
+SfxPool="*res://SFXPool.gd"
 
 [display]
 
