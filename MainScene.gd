@@ -130,6 +130,126 @@ func _ready() -> void:
 	update_purchase_button_state()
 	spawn_shelf_items()
 
+func _physics_process(delta: float) -> void:
+	_check_outside_bag_items(delta)
+	_check_bag_containment()
+
+# 袋の内部領域にあるかを判定（開口部より下、かつ袋の底・側壁の内側）
+func _is_inside_bag_cavity(item_pos: Vector2) -> bool:
+	if not has_node("Bag"):
+		return false
+	var bag_node = $Bag
+	var bag_pos = bag_node.global_position
+	var bag_w = bag_node.width if "width" in bag_node else 380.0
+	var half_w = (bag_w * 0.5)
+	
+	var in_x = abs(item_pos.x - bag_pos.x) < (half_w - 10.0)
+	var in_y = (item_pos.y >= bag_pos.y + 10.0) and (item_pos.y <= 855.0)
+	return in_x and in_y
+
+# アイテムを袋に正式登録（内部に入った商品のみ）
+func _register_item_in_bag(item: RigidBody2D) -> void:
+	if not is_instance_valid(item):
+		return
+	if item in packed_items or item.get_meta("in_bag", false):
+		return
+	packed_items.append(item)
+	item.set_meta("in_bag", true)
+	item.set_meta("has_settled_in_bag", true)
+	if item.has_meta("despawn_timer"):
+		item.remove_meta("despawn_timer")
+	_recalculate_bag()
+	print("★ 商品が袋に入りました: ", item.get_meta("item_name", "商品"))
+
+# スポナーから離れたアイテムの管理（飛行中の袋イン判定、および袋外アイテムの3秒後デストロイ）
+func _check_outside_bag_items(delta: float) -> void:
+	for child in get_children():
+		if child is RigidBody2D and child.has_meta("price"):
+			if child == grabbed_item:
+				continue
+			if child in packed_items or child.get_meta("in_bag", false):
+				continue
+			# スポナー（棚）に静止している商品は保持
+			if child.freeze and child.get_meta("slot_index", -1) >= 0:
+				continue
+				
+			# 投げ飛ばされて落下中のアイテムが袋の内部に入ったかチェック
+			if _is_inside_bag_cavity(child.global_position) and child.linear_velocity.y > -20.0:
+				_register_item_in_bag(child)
+				continue
+				
+			# 袋に入らなかったアイテム: 約3秒後にデストロイ（※ゲームオーバーにはならない）
+			var timer: float = child.get_meta("despawn_timer", 3.0) - delta
+			child.set_meta("despawn_timer", timer)
+			if timer <= 0.0:
+				_destroy_item(child)
+
+func _destroy_item(item: RigidBody2D) -> void:
+	if not is_instance_valid(item) or item.has_meta("is_destroying"):
+		return
+	item.set_meta("is_destroying", true)
+	item.collision_layer = 0
+	item.collision_mask = 0
+	var tween = create_tween()
+	tween.tween_property(item, "scale", Vector2.ZERO, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(item, "modulate:a", 0.0, 0.15)
+	tween.tween_callback(item.queue_free)
+
+# １度袋の中に入ったもの（has_settled_in_bag）が袋から出た場合のみゲームオーバー
+func _check_bag_containment() -> void:
+	if is_game_over or not has_node("Bag"):
+		return
+		
+	var bag_node = $Bag
+	var bag_pos = bag_node.global_position
+	var bag_w = bag_node.width if "width" in bag_node else 380.0
+	var half_w = (bag_w * 0.5)
+
+	for item in packed_items:
+		if not is_instance_valid(item):
+			continue
+			
+		# 一度袋の内部にしっかり収まった商品だけを対象とする
+		if not item.get_meta("has_settled_in_bag", false):
+			continue
+			
+		var pos = item.global_position
+		var escaped = false
+		
+		# 1. 左右にはみ出して袋の外へこぼれ落ちた
+		if abs(pos.x - bag_pos.x) > (half_w + 35.0):
+			escaped = true
+		# 2. 下に突き抜けて袋の外へこぼれた（底抜け・床落下）
+		elif pos.y > 865.0:
+			escaped = true
+		# 3. 袋の口から上へ飛び出して外へこぼれ出た
+		elif (pos.y < bag_pos.y - 15.0) and (abs(pos.x - bag_pos.x) > half_w):
+			escaped = true
+			
+		if escaped:
+			_on_item_escaped_bag(item)
+			break
+
+# 袋からアイテムがこぼれ出た時の処理（ゲームオーバー）
+func _on_item_escaped_bag(item: RigidBody2D) -> void:
+	if is_game_over:
+		return
+	is_game_over = true
+	update_purchase_button_state()
+	var item_name = item.get_meta("item_name", "商品")
+	print("★ 袋の中に入っていた%sが袋からこぼれ出ました！ゲームオーバー" % item_name)
+	
+	if grabbed_item and is_instance_valid(grabbed_item):
+		grabbed_item.freeze = false
+		grabbed_item.collision_layer = 3
+		grabbed_item.collision_mask = 3
+		grabbed_item = null
+	
+	var tree = get_tree()
+	if tree:
+		await tree.create_timer(1.2).timeout
+	_go_to_result_screen()
+
 func _process(delta: float) -> void:
 	if is_game_over:
 		return
@@ -153,7 +273,7 @@ func _update_timer_display() -> void:
 		else:
 			timer_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 1))
 
-# お得額表示を更新
+# 額表示を更新
 func update_wallet_display() -> void:
 	if wallet_label:
 		var prefix = "+" if profit_money > 0 else ""
@@ -172,7 +292,7 @@ func update_total_price_display() -> void:
 		else:
 			price_label.add_theme_color_override("font_color", Color(0.06, 0.16, 0.25, 1))
 
-# 購入ボタンの状態を更新（お金がマイナスでなく、袋に商品がある時のみ袋追加・購入可能）
+# 購入ボタンの状態を更新
 func update_purchase_button_state() -> void:
 	if purchase_button:
 		var projected_profit = profit_money + current_bag_value
@@ -278,7 +398,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	# 大きさに応じて重さ（mass）も連動して変動
 	item.mass = data["mass"] * (size_scale * size_scale)
 	
-	# 【金額の変動】大きさに応じて金額を計算（10円単位に四捨五入）
+	# 【金額の変動】大きさに応じて金額を計算
 	var base_price: int = data["price"]
 	var calculated_price: int = int(round((base_price * size_scale) / 10.0) * 10)
 	calculated_price = max(calculated_price, 10)
@@ -383,6 +503,10 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 	for res in results:
 		var collider = res.collider
 		if collider is RigidBody2D and collider.has_meta("price"):
+			# ★ 袋に入ったオブジェクトには触れることができない
+			if collider in packed_items or collider.get_meta("in_bag", false):
+				continue
+				
 			grabbed_item = collider
 			grab_offset = collider.global_position - mouse_pos
 			grabbed_item.freeze = true
@@ -402,33 +526,26 @@ func _release_grabbed_item() -> void:
 		grabbed_item.freeze = false
 		grabbed_item.z_index = 5
 		
+		# 手の動きに合わせた慣性速度をつける（投げ飛ばし可能）
 		grabbed_item.linear_velocity = mouse_velocity.clamp(Vector2(-1500, -1500), Vector2(1500, 1500)) * 0.5
 		
 		var slot_idx: int = grabbed_item.get_meta("slot_index", -1)
-		var was_in_bag = (grabbed_item in packed_items)
+		grabbed_item.collision_layer = 3
+		grabbed_item.collision_mask = 3
 
-		if _is_above_bag_opening(grabbed_item.global_position):
-			grabbed_item.collision_layer = 3
-			grabbed_item.collision_mask = 3
-			
-			if not was_in_bag:
-				packed_items.append(grabbed_item)
-				_recalculate_bag()
-				
-				grabbed_item.set_meta("slot_index", -1)
-				if slot_idx >= 0:
-					get_tree().create_timer(0.4).timeout.connect(func(): spawn_item_at_slot(slot_idx))
+		# スロット補充（手を離したら0.4秒後に新商品を補充）
+		grabbed_item.set_meta("slot_index", -1)
+		if slot_idx >= 0:
+			var tree = get_tree()
+			if tree:
+				tree.create_timer(0.4).timeout.connect(func(): spawn_item_at_slot(slot_idx))
+
+		# 手を離した瞬間に既に袋の内部に入っている場合
+		if _is_inside_bag_cavity(grabbed_item.global_position):
+			_register_item_in_bag(grabbed_item)
 		else:
-			grabbed_item.collision_layer = 4 
-			grabbed_item.collision_mask = 1  
-
-			if was_in_bag:
-				packed_items.erase(grabbed_item)
-				_recalculate_bag()
-
-			grabbed_item.set_meta("slot_index", -1)
-			if slot_idx >= 0:
-				get_tree().create_timer(0.8).timeout.connect(func(): spawn_item_at_slot(slot_idx))
+			# 投げ飛ばされた/袋の外で離された場合: 3秒のデスポーンタイマーを設定（飛行・落下中はゲームオーバーにならない）
+			grabbed_item.set_meta("despawn_timer", 3.0)
 			
 		grabbed_item = null
 		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1283196.mp3"))
@@ -497,7 +614,9 @@ func _on_bag_broken() -> void:
 		grabbed_item.collision_mask = 3
 		grabbed_item = null
 	
-	await get_tree().create_timer(1.2).timeout
+	var tree = get_tree()
+	if tree:
+		await tree.create_timer(1.2).timeout
 	_go_to_result_screen()
 
 # 制限時間終了時の処理（ゲームセット）
@@ -517,7 +636,9 @@ func _on_time_up() -> void:
 			if is_instance_valid(item) and item.get_meta("is_special", false):
 				special_items_count += 1
 				
-	await get_tree().create_timer(0.8).timeout
+	var tree = get_tree()
+	if tree:
+		await tree.create_timer(0.8).timeout
 	_go_to_result_screen()
 
 # リザルト画面遷移
@@ -526,4 +647,6 @@ func _go_to_result_screen() -> void:
 	ResultScreenClass.items_count = items_packed_count
 	ResultScreenClass.special_count = special_items_count
 	ResultScreenClass.bags_count = bags_used_count
-	get_tree().change_scene_to_file("res://ResultScreen.tscn")
+	var tree = get_tree()
+	if tree:
+		tree.change_scene_to_file("res://ResultScreen.tscn")
