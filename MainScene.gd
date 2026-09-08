@@ -685,9 +685,8 @@ func buy_bag(bag_type: String) -> void:
 	active_sets.clear()
 	bags_used_count += 1
 	
-	var sfx = get_node_or_null("/root/SfxPool")
-	if sfx and sfx.has_method("play_sfx"):
-		sfx.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
 		
 	close_bag_shop()
 	update_wallet_display()
@@ -704,9 +703,8 @@ func _on_bag_broken() -> void:
 	close_bag_shop()
 	update_purchase_button_state()
 	print("★ 袋が破れました！ゲームセット")
-	var sfx = get_node_or_null("/root/SfxPool")
-	if sfx and sfx.has_method("play_sfx"):
-		sfx.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3
