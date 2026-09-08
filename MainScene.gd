@@ -310,7 +310,7 @@ func spawn_item_at_slot(slot_idx: int) -> void:
 	item.scale = Vector2.ZERO
 	var tween = create_tween()
 	tween.tween_property(item, "scale", Vector2(size_scale, size_scale), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_400832.mp3"))
 # 特選シールを商品に貼り付ける
 func _attach_special_sticker(item: RigidBody2D) -> void:
 	var sticker = Sprite2D.new()
@@ -390,12 +390,12 @@ func _try_grab_item(mouse_pos: Vector2) -> void:
 			
 			grabbed_item.collision_layer = 0
 			grabbed_item.collision_mask = 0
-			
+			SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1272928.mp3"))
 			var slot_idx = collider.get_meta("slot_index", -1)
 			if slot_idx >= 0 and slot_idx < price_tags.size():
 				price_tags[slot_idx].modulate.a = 0.4
 			break
-
+	
 # 掴んでいた商品を離す
 func _release_grabbed_item() -> void:
 	if grabbed_item and is_instance_valid(grabbed_item):
@@ -431,6 +431,7 @@ func _release_grabbed_item() -> void:
 				get_tree().create_timer(0.8).timeout.connect(func(): spawn_item_at_slot(slot_idx))
 			
 		grabbed_item = null
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1283196.mp3"))
 
 func _is_above_bag_opening(item_pos: Vector2) -> bool:
 	if not has_node("Bag"):

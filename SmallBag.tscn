@@ -8,5 +8,4 @@ points = 14
 stiffness = 2200.0
 maximum_stretch = 1.04
 constraint_strength = 150.0
-break_threshold = 110.0
 smooth_subdivisions = 8

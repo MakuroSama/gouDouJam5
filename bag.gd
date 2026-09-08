@@ -569,7 +569,8 @@ func _physics_process(_delta: float) -> void:
 			var b := links[i + 1]
 
 			var distance := a.global_position.distance_to(b.global_position)
-
+			if distance > break_threshold/1.5:
+				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
 			if distance > break_threshold:
 				_break_joint(i)
 
@@ -722,7 +723,7 @@ func _break_joint(
 	if not _is_broken_signaled:
 		_is_broken_signaled = true
 		bag_broken.emit()
-
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
 # ============================================================
 # SMOOTH BAG DRAWING
 # ============================================================
