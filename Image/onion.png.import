@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://crmu57j0qa67r"
-path="res://.godot/imported/tamanegi.png-5fad1309daa0dba7fe02a3c79690e6ec.ctex"
+uid="uid://du6eo1u0un0vb"
+path="res://.godot/imported/onion.png-a652ad346b82c84c4ccee3a11dbc9b12.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Image/tamanegi.png"
-dest_files=["res://.godot/imported/tamanegi.png-5fad1309daa0dba7fe02a3c79690e6ec.ctex"]
+source_file="res://Image/onion.png"
+dest_files=["res://.godot/imported/onion.png-a652ad346b82c84c4ccee3a11dbc9b12.ctex"]
 
 [params]
 
