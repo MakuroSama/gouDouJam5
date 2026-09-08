@@ -194,7 +194,7 @@ func _destroy_item(item: RigidBody2D) -> void:
 	tween.tween_property(item, "scale", Vector2.ZERO, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(item, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(item.queue_free)
-
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1128250.mp3"))
 # １度袋の中に入ったもの（has_settled_in_bag）が袋から出た場合のみゲームオーバー
 func _check_bag_containment() -> void:
 	if is_game_over or not has_node("Bag"):
@@ -594,7 +594,7 @@ func _on_purchase_button_pressed() -> void:
 	current_bag_value = 0
 	active_sets.clear()
 	bags_used_count += 1
-	
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_959278.mp3"))
 	update_wallet_display()
 	update_total_price_display()
 	update_purchase_button_state()
@@ -607,7 +607,7 @@ func _on_bag_broken() -> void:
 	is_game_over = true
 	update_purchase_button_state()
 	print("★ 袋が破れました！ゲームセット")
-	
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3

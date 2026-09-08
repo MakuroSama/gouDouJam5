@@ -723,7 +723,7 @@ func _break_joint(
 	if not _is_broken_signaled:
 		_is_broken_signaled = true
 		bag_broken.emit()
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+
 # ============================================================
 # SMOOTH BAG DRAWING
 # ============================================================
