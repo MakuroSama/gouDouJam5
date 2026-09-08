@@ -112,7 +112,7 @@ var is_game_over: bool = false
 var items_packed_count: int = 0
 var special_items_count: int = 0
 var bags_used_count: int = 1
-
+var closeToEnd = false
 func _ready() -> void:
 	randomize()
 	
@@ -268,7 +268,11 @@ func _update_timer_display() -> void:
 	if timer_label:
 		var sec: int = int(ceil(remaining_time))
 		timer_label.text = "残り %d秒" % sec
+		
 		if sec <= 30:
+			if closeToEnd == false:
+				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+				closeToEnd = true
 			timer_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1))
 		else:
 			timer_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 1))
@@ -626,7 +630,7 @@ func _on_time_up() -> void:
 	is_game_over = true
 	update_purchase_button_state()
 	print("★ 制限時間180秒終了！ゲームセット")
-	
+	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1385435.mp3"))
 	# 時間切れ時点で袋が破れていなければ、袋の中身を精算
 	if packed_items.size() > 0:
 		var bag_data = calculate_bag_value()
