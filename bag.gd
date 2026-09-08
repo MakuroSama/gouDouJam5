@@ -147,15 +147,11 @@ func _ready() -> void:
 
 	$LeftHook.position.x = -width / 2.0
 	$rightHook.position.x = width / 2.0
+	
+	left_hook = $LeftHook
 
-	left_hook = get_node_or_null(hook_path)
-	right_hook = get_node_or_null(hook2_path)
 
-	if left_hook == null:
-		left_hook = $LeftHook
-
-	if right_hook == null:
-		right_hook = $rightHook
+	right_hook = $rightHook
 
 	_build_bag()
 	_connect_hooks()
@@ -223,10 +219,10 @@ func _make_link(pos: Vector2) -> RigidBody2D:
 func _create_smooth_collider(link: RigidBody2D) -> void:
 
 	# Remove the collider created by this script if one exists.
-	var old := link.get_node_or_null("_BagCollider")
-
-	if old != null:
-		old.queue_free()
+	if get_tree().current_scene.name == "MainScene":
+		var old := link.get_node_or_null("_BagCollider")
+		if old != null:
+			old.queue_free()
 
 	var collision := CollisionShape2D.new()
 
