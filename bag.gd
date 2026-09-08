@@ -113,7 +113,9 @@ var maximum_stretch: float = 1.08
 @export var smooth_subdivisions: int = 40
 @export var bag_color: Color = Color(0.0, 1.0, 0.0, 1.0)
 @export var bag_break_color: Color = Color(1.0, 0.0, 0.0, 1.0)
-
+@export_category("Bag Fill")
+@export var draw_bag_fill: bool = true
+@export var bag_fill_shader: Shader
 
 # ============================================================
 # INTERNAL
@@ -132,6 +134,7 @@ var previous_positions: Array[Vector2] = []
 var left_hook: Node2D
 var right_hook: Node2D
 
+var bag_fill: Polygon2D
 
 # ============================================================
 # READY
@@ -153,7 +156,7 @@ func _ready() -> void:
 
 	_build_bag()
 	_connect_hooks()
-
+	_setup_bag_fill()
 	queue_redraw()
 	for child in links[0].get_children():
 		if child is CollisionShape2D or child is CollisionPolygon2D:
@@ -161,6 +164,8 @@ func _ready() -> void:
 	for child in links[links.size()-1].get_children():
 		if child is CollisionShape2D or child is CollisionPolygon2D:
 			child.disabled = true
+	z_as_relative = false
+	z_index = 4  # just below bag_fill's 5, so fill still layers over the line correctly if needed
 # ============================================================
 # CREATE LINK
 # ============================================================
@@ -578,9 +583,8 @@ func _physics_process(_delta: float) -> void:
 	# --------------------------------------------------------
 
 	_clamp_velocities()
-
 	_store_previous_positions()
-
+	_update_bag_fill()
 	queue_redraw()
 
 
@@ -722,7 +726,7 @@ func _break_joint(
 
 func _draw() -> void:
 
-
+	
 	if not draw_bag:
 		return
 
@@ -752,29 +756,11 @@ func _draw() -> void:
 	# so we don't need a huge line width to fake volume.
 	# --------------------------------------------------------
 
-	var center := Vector2.ZERO
-
-	for p in raw_points:
-		center += p
-
-	center /= raw_points.size()
-
-	var offset_points: Array[Vector2] = []
-
-	for p in raw_points:
-
-		var direction := p - center
-
-		if direction.length() > 0.001:
-			direction = direction.normalized()
-		else:
-			direction = Vector2.UP
-
-		offset_points.append(p - direction * link_collision_radius)
-
+	
+		
 	var subdivisions = max(smooth_subdivisions, 1)
 
-	var smooth_points := _smooth_points(offset_points, subdivisions)
+	var smooth_points := _get_offset_points()
 
 	for i in range(smooth_points.size() - 1):
 
@@ -860,3 +846,122 @@ func _smooth_points(
 	)
 
 	return result
+
+# ============================================================
+# SHADER BAG FILL
+# ============================================================
+
+func _setup_bag_fill() -> void:
+
+	if not draw_bag_fill:
+		return
+
+	bag_fill = Polygon2D.new()
+	bag_fill.name = "BagFill"
+	bag_fill.color = Color(1, 1, 1, 1) # actual color/alpha comes from the shader
+
+	var mat := ShaderMaterial.new()
+	mat.shader = bag_fill_shader
+	bag_fill.material = mat
+	# Draw above other game objects (boxes, etc.) regardless of
+	# where they sit in the scene tree, so the bag reads as
+	# wrapping around them rather than sitting underneath.
+	bag_fill.z_as_relative = false
+	bag_fill.z_index = 5
+	add_child(bag_fill)
+
+func _update_bag_fill() -> void:
+
+	if bag_fill == null:
+		return
+
+	if broken.has(true):
+		bag_fill.visible = false
+		return
+
+	var local_points: Array[Vector2] = []
+
+	for point in _get_offset_points():
+		
+		if is_finite(point.x) and is_finite(point.y):
+			local_points.append(point)
+
+	if local_points.size() < 2 or left_hook == null or right_hook == null:
+		bag_fill.visible = false
+		return
+
+	local_points.append(to_local(left_hook.global_position))
+	local_points.append(to_local(right_hook.global_position))
+
+	var min_pt := local_points[0]
+	var max_pt := local_points[0]
+
+	for p in local_points:
+		min_pt = min_pt.min(p)
+		max_pt = max_pt.max(p)
+
+	var size := max_pt - min_pt
+	size.x = max(size.x, 0.001)
+	size.y = max(size.y, 0.001)
+
+	bag_fill.polygon = PackedVector2Array(local_points)
+
+	var mat := bag_fill.material as ShaderMaterial
+	if mat != null:
+		mat.set_shader_parameter("bounds_min", min_pt)
+		mat.set_shader_parameter("bounds_size", size)
+
+	bag_fill.visible = true
+	
+# ============================================================
+# OFFSET POINTS
+# ============================================================
+
+func _get_offset_points()-> Array[Vector2]:
+	var raw_points: Array[Vector2] = []
+
+	for link in links:
+		if is_instance_valid(link):
+			var p := link.global_position
+			# SAFETY: never feed NaN/Infinite positions to the
+			# renderer — Godot's line drawing can throw or
+			# silently corrupt the draw batch on bad input.
+			if is_finite(p.x) and is_finite(p.y):
+				raw_points.append(to_local(p))
+
+	if raw_points.size() < 2:
+		return []
+
+	# --------------------------------------------------------
+	# PUSH POINTS OUTWARD FROM CENTER
+	#
+	# raw_points only traces link CENTERS. Offsetting each
+	# point away from the bag's centroid by ~link_collision_radius
+	# makes the line trace the bag's outer surface instead,
+	# so we don't need a huge line width to fake volume.
+	# --------------------------------------------------------
+
+	var center := Vector2.ZERO
+
+	for p in raw_points:
+		center += p
+
+	center /= raw_points.size()
+
+	var offset_points: Array[Vector2] = []
+
+	for p in raw_points:
+
+		var direction := p - center
+
+		if direction.length() > 0.001:
+			direction = direction.normalized()
+		else:
+			direction = Vector2.UP
+
+		offset_points.append(p - direction * link_collision_radius)
+	var subdivisions = max(smooth_subdivisions, 1)
+
+	var smooth_points := _smooth_points(offset_points, subdivisions)
+
+	return smooth_points

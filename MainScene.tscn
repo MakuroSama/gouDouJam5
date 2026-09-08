@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://d2si4er2oavfh"]
+[gd_scene format=3 uid="uid://d2si4er2oavfh"]
 
 [ext_resource type="Script" uid="uid://c364g2es0x6s1" path="res://MainScene.gd" id="1_main_script"]
 [ext_resource type="Texture2D" uid="uid://domw08f2e025r" path="res://Image/Shelf.png" id="2_shelf_tex"]
@@ -103,4 +103,4 @@ constraint_strength = 150.0
 break_threshold = 110.0
 smooth_subdivisions = 4
 
-[node name="PauseMenu" parent="." instance=ExtResource("6_pause_scene")]
+[node name="PauseMenu" parent="." unique_id=1567808325 instance=ExtResource("6_pause_scene")]
