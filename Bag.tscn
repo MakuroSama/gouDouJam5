@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dt02r0xkkigoj" path="res://bag.gd" id="1_kksag"]
 [ext_resource type="PackedScene" uid="uid://b3d11nerq1hrv" path="res://Link.tscn" id="2_cknj3"]
+[ext_resource type="Shader" uid="uid://cxe31bhd8y6l" path="res://Bag.gdshader" id="3_xe31j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_503qj"]
 
@@ -11,6 +12,7 @@
 script = ExtResource("1_kksag")
 link_scene = ExtResource("2_cknj3")
 smooth_subdivisions = 16
+bag_fill_shader = ExtResource("3_xe31j")
 
 [node name="LeftHook" type="StaticBody2D" parent="." unique_id=1169727133]
 collision_layer = 0
