@@ -1,4 +1,3 @@
-
 extends Node2D
 class_name Chain
 
@@ -53,6 +52,39 @@ var maximum_stretch: float = 1.08
 @export var link_mass: float = 0.05
 
 # ============================================================
+# SAFETY
+# ============================================================
+
+@export_category("Safety")
+
+# Hard cap on the corrective force applied by the length
+# constraint. Without this, a huge sudden stretch (e.g. a fast
+# object slamming into the bag) can generate a corrective force
+# large enough to fling links to extreme speeds in a single
+# frame, which then cascades through every neighboring spring.
+@export var max_correction_force: float = 4000.0
+
+# Hard cap on how fast any single link is allowed to move.
+# This is the actual "safety net": no matter what force gets
+# applied to a link (physics engine impulses, other scripts,
+# an exploding constraint, etc.) its velocity can never exceed
+# this, so the simulation can't run away.
+@export var max_link_speed: float = 6000.0
+
+# If a link moves further than this in a single physics step,
+# it's treated as a numerical explosion (not a "real" fast
+# collision) and the affected segment is broken immediately
+# instead of fighting it with more force.
+@export var max_step_displacement: float = 400.0
+
+# If enabled, any link/joint that goes NaN or Infinite (the
+# clearest sign the simulation has gone haywire) is caught and
+# repaired instead of being allowed to silently corrupt the
+# rest of the chain and the renderer.
+@export var recover_from_invalid_state: bool = true
+
+
+# ============================================================
 # HOOKS
 # ============================================================
 
@@ -92,6 +124,10 @@ var joints: Array[DampedSpringJoint2D] = []
 var broken: Array[bool] = []
 # Original distance between neighboring links.
 var rest_distances: Array[float] = []
+
+# Position of each link at the end of the previous physics
+# step. Used purely for explosion / teleport detection.
+var previous_positions: Array[Vector2] = []
 
 var left_hook: Node2D
 var right_hook: Node2D
@@ -163,6 +199,7 @@ func _make_link(pos: Vector2) -> RigidBody2D:
 	_create_smooth_collider(link)
 
 	links.append(link)
+	previous_positions.append(pos)
 
 	return link
 
@@ -228,6 +265,7 @@ func _build_bag() -> void:
 	joints.clear()
 	rest_distances.clear()
 	broken.clear()
+	previous_positions.clear()
 
 	# --------------------------------------------------------
 	# BAG GEOMETRY
@@ -401,6 +439,15 @@ func _physics_process(_delta: float) -> void:
 	if links.size() < 2:
 		return
 
+	# --------------------------------------------------------
+	# SAFETY PASS 1: catch NaN/Infinite state and clamp speed
+	#
+	# This runs BEFORE any spring/constraint logic so a link
+	# that already went haywire (e.g. from an engine-side
+	# collision impulse) can't poison the calculations below.
+	# --------------------------------------------------------
+
+	_apply_safety_net()
 
 	# --------------------------------------------------------
 	# HARD LENGTH CONSTRAINT
@@ -432,6 +479,14 @@ func _physics_process(_delta: float) -> void:
 		if distance <= 0.001:
 			continue
 
+		# SAFETY: if the distance itself is not a sane finite
+		# number, don't try to correct it with force (that
+		# would just inject NaN into the RigidBody2D). Break
+		# the segment instead and move on.
+		if not is_finite(distance):
+			_break_joint(i)
+			continue
+
 		if i >= rest_distances.size():
 			continue
 
@@ -441,6 +496,15 @@ func _physics_process(_delta: float) -> void:
 			rest_length *
 			maximum_stretch
 		)
+
+		# SAFETY: a jump this large in a single physics step
+		# is not a "stretchy bag" situation, it's a numerical
+		# explosion (huge impulse, tunneling collision, etc).
+		# Breaking here avoids fighting it with an even bigger
+		# corrective force next frame.
+		if distance > rest_length + max_step_displacement:
+			_break_joint(i)
+			continue
 
 		# Only correct the chain when it is actually
 		# stretched beyond its allowed length.
@@ -459,6 +523,15 @@ func _physics_process(_delta: float) -> void:
 				error *
 				constraint_strength
 			)
+
+			# SAFETY: clamp the correction force itself so a
+			# single extreme stretch can't apply an unbounded
+			# impulse.
+			if correction_force.length() > max_correction_force:
+				correction_force = (
+					correction_force.normalized()
+					* max_correction_force
+				)
 
 			a.apply_central_force(
 				correction_force
@@ -492,8 +565,133 @@ func _physics_process(_delta: float) -> void:
 			if distance > break_threshold:
 				_break_joint(i)
 
+	# --------------------------------------------------------
+	# SAFETY PASS 2: final velocity clamp
+	#
+	# Runs last so nothing added above (constraint forces,
+	# engine collision response, etc.) can leave a link moving
+	# faster than max_link_speed by the time the frame ends.
+	# --------------------------------------------------------
+
+	_clamp_velocities()
+
+	_store_previous_positions()
 
 	queue_redraw()
+
+
+# ============================================================
+# SAFETY NET
+# ============================================================
+
+# Detects and repairs links that have gone NaN/Infinite, and
+# catches single-frame teleports that indicate the simulation
+# has already gone unstable (rather than a legitimately fast
+# but valid collision response).
+func _apply_safety_net() -> void:
+
+	if not recover_from_invalid_state:
+		return
+
+	for i in range(links.size()):
+
+		var link := links[i]
+
+		if not is_instance_valid(link):
+			continue
+
+		var pos := link.global_position
+		var vel := link.linear_velocity
+
+		var pos_invalid := (
+			not is_finite(pos.x) or not is_finite(pos.y)
+		)
+		var vel_invalid := (
+			not is_finite(vel.x) or not is_finite(vel.y)
+		)
+
+		if pos_invalid or vel_invalid:
+
+			push_warning(
+				"Chain: link %d entered an invalid state, recovering." % i
+			)
+
+			# Recover to the last known-good position and stop
+			# it dead rather than letting NaN/Infinity spread
+			# through connected joints and the renderer.
+			var fallback := Vector2.ZERO
+
+			if i < previous_positions.size():
+				fallback = previous_positions[i]
+
+			link.global_position = fallback
+			link.linear_velocity = Vector2.ZERO
+			link.angular_velocity = 0.0
+
+			# A link that just exploded is not trustworthy;
+			# break its neighboring segments so the rest of
+			# the bag doesn't get dragged along with it.
+			if i - 1 >= 0:
+				_break_joint(i - 1)
+			if i < joints.size():
+				_break_joint(i)
+
+			continue
+
+		# Detect an implausible single-frame teleport even
+		# when the numbers are technically finite (e.g. a
+		# huge but valid-looking impulse from a fast object).
+		if i < previous_positions.size():
+
+			var step_distance := pos.distance_to(previous_positions[i])
+
+			if step_distance > max_step_displacement * 3.0:
+
+				push_warning(
+					"Chain: link %d moved implausibly far in one step, clamping."
+					% i
+				)
+
+				link.global_position = (
+					previous_positions[i]
+					+ (pos - previous_positions[i]).normalized()
+					* max_step_displacement
+				)
+				link.linear_velocity = link.linear_velocity.limit_length(
+					max_link_speed
+				)
+
+
+# Hard ceiling on how fast any link may move. This is the last
+# line of defense: whatever produced the velocity (springs,
+# constraints, engine collision impulses, external scripts)
+# doesn't matter — it simply cannot exceed this speed.
+func _clamp_velocities() -> void:
+
+	for link in links:
+
+		if not is_instance_valid(link):
+			continue
+
+		if not is_finite(link.linear_velocity.x) or not is_finite(link.linear_velocity.y):
+			link.linear_velocity = Vector2.ZERO
+			continue
+
+		if link.linear_velocity.length() > max_link_speed:
+			link.linear_velocity = link.linear_velocity.limit_length(
+				max_link_speed
+			)
+
+
+func _store_previous_positions() -> void:
+
+	for i in range(links.size()):
+
+		if i >= previous_positions.size():
+			previous_positions.append(Vector2.ZERO)
+
+		if is_instance_valid(links[i]):
+			previous_positions[i] = links[i].global_position
 
 
 # ============================================================
@@ -531,7 +729,12 @@ func _draw() -> void:
 
 	for link in links:
 		if is_instance_valid(link):
-			raw_points.append(to_local(link.global_position))
+			var p := link.global_position
+			# SAFETY: never feed NaN/Infinite positions to the
+			# renderer — Godot's line drawing can throw or
+			# silently corrupt the draw batch on bad input.
+			if is_finite(p.x) and is_finite(p.y):
+				raw_points.append(to_local(p))
 
 	if raw_points.size() < 2:
 		return
