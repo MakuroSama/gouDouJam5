@@ -1,35 +1,36 @@
 [gd_scene format=3 uid="uid://rfeniu4qgwyu"]
 
-[ext_resource type="PackedScene" uid="uid://drbo4mbruunlg" path="res://Bag.tscn" id="1_ldth5"]
+[ext_resource type="PackedScene" uid="uid://d1urles63yk7r" path="res://SmallBag.tscn" id="1_nx2bc"]
 [ext_resource type="PackedScene" uid="uid://buv5dd7bdglrl" path="res://cola.tscn" id="2_a2kt7"]
+[ext_resource type="PackedScene" uid="uid://fkwcwuya7qr3" path="res://BigBag.tscn" id="2_ftgq0"]
 [ext_resource type="PackedScene" uid="uid://cw7ukhm8n81dc" path="res://chikin.tscn" id="2_ydppn"]
 [ext_resource type="PackedScene" uid="uid://cpkt0747821ve" path="res://daikon.tscn" id="3_yk8n3"]
 [ext_resource type="PackedScene" uid="uid://cssr0fg55gr3x" path="res://orange.tscn" id="4_c4wsi"]
+[ext_resource type="PackedScene" uid="uid://d1w8v7ytherjx" path="res://MiddleBag.tscn" id="7_nx2bc"]
 
 [node name="Node2D" type="Node2D" unique_id=90045965]
 
+[node name="Bag3" parent="." unique_id=148969257 instance=ExtResource("1_nx2bc")]
+position = Vector2(379, 200)
+
+[node name="Bag2" parent="." unique_id=981097723 instance=ExtResource("2_ftgq0")]
+position = Vector2(1488, 200)
+
 [node name="Chikin" parent="." unique_id=1187842508 instance=ExtResource("2_ydppn")]
-position = Vector2(518, 130)
-collision_layer = 3
-collision_mask = 3
+position = Vector2(-604, 22)
 mass = 0.288
 
 [node name="Orange" parent="." unique_id=24999337 instance=ExtResource("4_c4wsi")]
-position = Vector2(641, -11)
-collision_layer = 3
-collision_mask = 3
+position = Vector2(-123, -26)
 mass = 0.34
 
 [node name="Daikon" parent="." unique_id=2000708975 instance=ExtResource("3_yk8n3")]
-position = Vector2(638, 88)
-collision_layer = 3
-collision_mask = 3
+position = Vector2(-773, 82)
 mass = 0.082
 
 [node name="Cola" parent="." unique_id=1170558013 instance=ExtResource("2_a2kt7")]
-position = Vector2(480, 1)
-collision_mask = 3
+position = Vector2(-1146, 84)
 mass = 0.357
 
-[node name="Bag" parent="." unique_id=148969257 instance=ExtResource("1_ldth5")]
-position = Vector2(577, 82)
+[node name="Bag" parent="." unique_id=716330577 instance=ExtResource("7_nx2bc")]
+position = Vector2(972, 200)
