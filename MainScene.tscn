@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://d2si4er2oavfh"]
+[gd_scene format=3 uid="uid://d2si4er2oavfh"]
 
 [ext_resource type="Script" uid="uid://c364g2es0x6s1" path="res://MainScene.gd" id="1_main_script"]
 [ext_resource type="Texture2D" uid="uid://domw08f2e025r" path="res://Image/Shelf.png" id="2_shelf_tex"]
@@ -141,61 +141,4 @@ constraint_strength = 150.0
 break_threshold = 110.0
 smooth_subdivisions = 4
 
-[node name="PauseMenu" parent="." instance=ExtResource("6_pause_scene")]
-
-[node name="HUD" type="CanvasLayer" parent="."]
-layer = 50
-
-[node name="ObiBanner" type="TextureRect" parent="HUD"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 120.0
-grow_horizontal = 2
-texture = ExtResource("8_obi_tex")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="MarginContainer" type="MarginContainer" parent="HUD"]
-offset_left = 35.0
-offset_top = 20.0
-offset_right = 750.0
-offset_bottom = 95.0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="WalletPanel" type="PanelContainer" parent="HUD/MarginContainer/HBoxContainer"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
-
-[node name="HBox" type="HBoxContainer" parent="HUD/MarginContainer/HBoxContainer/WalletPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="TitleLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 26
-text = "所持金:"
-vertical_alignment = 1
-
-[node name="WalletLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/WalletPanel/HBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 1.0, 0.4, 1)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 32
-text = "¥ 10,000"
-vertical_alignment = 1
-
-
-[node name="PurchaseButton" type="TextureButton" parent="HUD"]
-offset_left = 275.0
-offset_top = 955.0
-offset_right = 525.0
-offset_bottom = 1065.0
-texture_normal = ExtResource("10_purchase_tex")
-ignore_texture_size = true
-stretch_mode = 5
+[node name="PauseMenu" parent="." unique_id=1567808325 instance=ExtResource("6_pause_scene")]
