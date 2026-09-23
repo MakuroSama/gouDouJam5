@@ -11,7 +11,8 @@ func _ready():
 		add_child(p)
 		players.append(p)
 
-func play_sfx(stream: AudioStream, volume_db: float = 1.0):
+# 元の音量 1.0 dB をリニア値で1/3に調整 (1.0 - 9.54 dB ≈ -8.5 dB)
+func play_sfx(stream: AudioStream, volume_db: float = -8.5):
 	for p in players:
 		if not p.playing:
 			p.stream = stream
@@ -20,4 +21,5 @@ func play_sfx(stream: AudioStream, volume_db: float = 1.0):
 			return
 	# optional: steal the oldest voice if pool is full
 	players[0].stream = stream
+	players[0].volume_db = volume_db
 	players[0].play()
