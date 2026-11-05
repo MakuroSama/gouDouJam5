@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://kqq7hgm44fxr" path="res://Image/scale.png" id="9_scale_tex"]
 [ext_resource type="Texture2D" uid="uid://c5nu3dw02pe13" path="res://Image/Purchase.png" id="10_purchase_tex"]
 [ext_resource type="Texture2D" uid="uid://cg7bpnmufs2n0" path="res://Image/nc406699_ziperbag.png" id="11_ziperbag_tex"]
+[ext_resource type="PackedScene" path="res://ComboListPopup.tscn" id="12_combolist_scene"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(2100, 60)
@@ -48,6 +49,60 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_btn"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.0941176, 0.356863, 0.47451, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.960784, 0.552941, 0.121569, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.12, 0.42, 0.55, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.75, 0.2, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.06, 0.25, 0.35, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.45, 0.1, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [node name="MainScene" type="Node2D" unique_id=1995663294]
 script = ExtResource("1_main_script")
@@ -204,7 +259,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 32
-text = "-10000 円"
+text = "-5,000 円"
 vertical_alignment = 1
 
 [node name="TimerPanel" type="PanelContainer" parent="HUD" unique_id=1148757947]
@@ -237,9 +292,30 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 30
-text = "残り 180秒"
+text = "残り 90秒"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ComboListButton" type="Button" parent="HUD" unique_id=778899001]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -170.0
+offset_top = 22.0
+offset_right = 170.0
+offset_bottom = 98.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_combo_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_combo_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_combo_btn_pressed")
+text = "コンボ商品リスト"
 
 [node name="PurchaseButton" type="TextureButton" parent="HUD" unique_id=2084990826]
 offset_left = 275.0
@@ -282,7 +358,7 @@ offset_bottom = 62.0
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
-text = "✕ 閉じる"
+text = "閉じる"
 
 [node name="ColSmall" type="Control" parent="HUD/BagShopPanel/ShopBox" unique_id=620327332]
 anchors_preset = 0
@@ -327,7 +403,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "価　格: 10000円"
+text = "価　格: 5000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -342,7 +418,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "制限時間:　+10秒"
+text = "制限時間:　+5秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -399,7 +475,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "価　格: 20000円"
+text = "価　格: 10000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -414,7 +490,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "制限時間:　+20秒"
+text = "制限時間:　+10秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -471,7 +547,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "価　格: 30000円"
+text = "価　格: 15000円"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -486,7 +562,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("7_font")
 theme_override_font_sizes/font_size = 36
-text = "制限時間:　+30秒"
+text = "制限時間:　+15秒"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -499,3 +575,5 @@ offset_bottom = 620.0
 texture_normal = ExtResource("10_purchase_tex")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="ComboListPopup" parent="HUD" unique_id=778899002 instance=ExtResource("12_combolist_scene")]

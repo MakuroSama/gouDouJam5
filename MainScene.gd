@@ -67,9 +67,9 @@ const BAG_SCENES = {
 
 # 袋ショップの価格・制限時間データ
 const BAG_SHOP_DATA = {
-	"small": {"name": "小", "price": 10000, "time_bonus": 10.0},
-	"middle": {"name": "中", "price": 20000, "time_bonus": 20.0},
-	"big": {"name": "大", "price": 30000, "time_bonus": 30.0},
+	"small": {"name": "小", "price": 5000, "time_bonus": 5.0},
+	"middle": {"name": "中", "price": 10000, "time_bonus": 10.0},
+	"big": {"name": "大", "price": 15000, "time_bonus": 15.0},
 }
 
 var current_bag_type: String = "middle"
@@ -100,11 +100,11 @@ var last_mouse_pos: Vector2 = Vector2.ZERO
 var mouse_velocity: Vector2 = Vector2.ZERO
 
 # お金・タイマー・袋
-const INITIAL_PROFIT: int = -10000
+const INITIAL_PROFIT: int = -5000
 var profit_money: int = INITIAL_PROFIT
 var current_bag_value: int = 0
 var active_sets: Array[String] = []
-var remaining_time: float = 180.0
+var remaining_time: float = 90.0
 
 # 現在袋に入っている商品
 var packed_items: Array[RigidBody2D] = []
@@ -118,6 +118,8 @@ var packed_items: Array[RigidBody2D] = []
 @onready var buy_middle_btn: TextureButton = get_node_or_null("HUD/BagShopPanel/ShopBox/ColMiddle/BuyMiddleButton")
 @onready var buy_big_btn: TextureButton = get_node_or_null("HUD/BagShopPanel/ShopBox/ColBig/BuyBigButton")
 @onready var shop_close_btn: Button = get_node_or_null("HUD/BagShopPanel/ShopBox/CloseButton")
+@onready var combo_list_btn: Button = get_node_or_null("HUD/ComboListButton")
+@onready var combo_list_popup: Control = get_node_or_null("HUD/ComboListPopup")
 
 # ゲームオーバー状態と統計
 var is_game_over: bool = false
@@ -143,6 +145,14 @@ func _ready() -> void:
 		buy_middle_btn.pressed.connect(func(): buy_bag("middle"))
 	if buy_big_btn:
 		buy_big_btn.pressed.connect(func(): buy_bag("big"))
+		
+	if combo_list_btn and combo_list_popup:
+		combo_list_btn.pressed.connect(func():
+			if combo_list_popup.visible:
+				combo_list_popup.close()
+			else:
+				combo_list_popup.open()
+		)
 	
 	update_wallet_display()
 	_update_timer_display()
@@ -180,6 +190,8 @@ func _register_item_in_bag(item: RigidBody2D) -> void:
 	if item.has_meta("despawn_timer"):
 		item.remove_meta("despawn_timer")
 	_recalculate_bag()
+	if SfxPool:
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/茂みガサガサ.mp3"))
 	print("★ 商品が袋に入りました: ", item.get_meta("item_name", "商品"))
 
 # スポナーから離れたアイテムの管理（飛行中の袋イン判定、および袋外アイテムの管理）
@@ -287,12 +299,16 @@ func _on_item_escaped_bag(item: RigidBody2D) -> void:
 		return
 	is_game_over = true
 	close_bag_shop()
+	if combo_list_popup and combo_list_popup.visible:
+		combo_list_popup.close()
 	update_purchase_button_state()
 	var item_name = item.get_meta("item_name", "商品")
 	print("★ 袋の中に入っていた%sが袋からこぼれ出ました！ゲームオーバー" % item_name)
 	
 	if SfxPool:
-		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+		SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+		SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
+		SfxPool.play_priority_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"), -2.0)
 		
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
@@ -306,7 +322,7 @@ func _on_item_escaped_bag(item: RigidBody2D) -> void:
 	_go_to_result_screen()
 
 func _process(delta: float) -> void:
-	if is_game_over:
+	if is_game_over or (combo_list_popup and combo_list_popup.visible):
 		return
 	
 	remaining_time -= delta
@@ -324,12 +340,20 @@ func _update_timer_display() -> void:
 		var sec: int = int(ceil(remaining_time))
 		timer_label.text = "残り %d秒" % sec
 		
-		if sec <= 30:
+		if sec <= 0:
+			if closeToEnd:
+				SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+				closeToEnd = false
+			timer_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1))
+		elif sec <= 15:
 			if closeToEnd == false:
 				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
 				closeToEnd = true
 			timer_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1))
 		else:
+			if closeToEnd:
+				SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+				closeToEnd = false
 			timer_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 1))
 
 # 額表示を更新
@@ -354,7 +378,7 @@ func update_total_price_display() -> void:
 # 購入ボタンの状態を更新
 func update_purchase_button_state() -> void:
 	if purchase_button:
-		var can_open = (packed_items.size() > 0 or profit_money >= 10000) and not is_game_over
+		var can_open = (packed_items.size() > 0 or profit_money >= 5000) and not is_game_over
 		purchase_button.disabled = not can_open
 		purchase_button.modulate.a = 1.0 if can_open else 0.4
 	if bag_shop_panel and bag_shop_panel.visible:
@@ -526,12 +550,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			close_bag_shop()
 			get_viewport().set_input_as_handled()
 			return
-		elif event.keycode == KEY_1:
-			change_bag("small")
-		elif event.keycode == KEY_2:
-			change_bag("middle")
-		elif event.keycode == KEY_3:
-			change_bag("big")
 
 # 袋を切り替える
 func change_bag(type_name: String) -> void:
@@ -556,7 +574,7 @@ func change_bag(type_name: String) -> void:
 
 # マウス位置にある商品を掴む
 func _try_grab_item(mouse_pos: Vector2) -> void:
-	if is_game_over or (bag_shop_panel and bag_shop_panel.visible):
+	if is_game_over or (bag_shop_panel and bag_shop_panel.visible) or (combo_list_popup and combo_list_popup.visible):
 		return
 		
 	var space_state = get_world_2d().direct_space_state
@@ -705,10 +723,14 @@ func _on_bag_broken() -> void:
 		return
 	is_game_over = true
 	close_bag_shop()
+	if combo_list_popup and combo_list_popup.visible:
+		combo_list_popup.close()
 	update_purchase_button_state()
 	print("★ 袋が破れました！ゲームセット")
 	if SfxPool:
-		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"))
+		SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+		SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
+		SfxPool.play_priority_sfx(preload("res://SE・BGM/SE/audiostock_1600118.mp3"), -2.0)
 	if grabbed_item and is_instance_valid(grabbed_item):
 		grabbed_item.freeze = false
 		grabbed_item.collision_layer = 3
@@ -726,9 +748,13 @@ func _on_time_up() -> void:
 		return
 	is_game_over = true
 	close_bag_shop()
+	if combo_list_popup and combo_list_popup.visible:
+		combo_list_popup.close()
 	update_purchase_button_state()
-	print("★ 制限時間180秒終了！ゲームセット")
-	SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1385435.mp3"))
+	print("★ 制限時間90秒終了！ゲームセット")
+	if SfxPool:
+		SfxPool.stop_stream(preload("res://SE・BGM/SE/audiostock_323312.mp3"))
+		SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1385435.mp3"))
 	# 時間切れ時点で袋が破れていなければ、袋の中身を精算
 	if packed_items.size() > 0:
 		var bag_data = calculate_bag_value()

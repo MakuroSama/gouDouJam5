@@ -127,6 +127,7 @@ var links: Array[RigidBody2D] = []
 var joints: Array[DampedSpringJoint2D] = []
 var broken: Array[bool] = []
 var _is_broken_signaled: bool = false
+var _stretch_sfx_timer: float = 0.0
 # Original distance between neighboring links.
 var rest_distances: Array[float] = []
 
@@ -442,7 +443,10 @@ func _add_hook(
 # PHYSICS CONSTRAINT
 # ============================================================
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+
+	if _stretch_sfx_timer > 0.0:
+		_stretch_sfx_timer -= delta
 
 	if links.size() < 2:
 		return
@@ -569,8 +573,11 @@ func _physics_process(_delta: float) -> void:
 			var b := links[i + 1]
 
 			var distance := a.global_position.distance_to(b.global_position)
-			if distance > break_threshold/1.5:
-				SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
+			if not _is_broken_signaled and not broken.has(true):
+				if distance > break_threshold / 1.5:
+					if _stretch_sfx_timer <= 0.0:
+						_stretch_sfx_timer = 0.6
+						SfxPool.play_sfx(preload("res://SE・BGM/SE/audiostock_1309294.mp3"))
 			if distance > break_threshold:
 				_break_joint(i)
 

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dqsvs5sdpaeyh" path="res://Image/Back.jpg" id="2_mom7w"]
 [ext_resource type="Texture2D" uid="uid://c2rbg1otrvxt4" path="res://Image/rogo.png" id="3_kpexm"]
 [ext_resource type="Texture2D" uid="uid://dlg2xyal3g2ge" path="res://Image/button.png" id="4_button_tex"]
+[ext_resource type="Texture2D" uid="uid://fuyhkf5pls50" path="res://Image/Playingboard.png" id="5_playingboard_tex"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn"]
 texture = ExtResource("4_button_tex")
@@ -28,6 +29,60 @@ texture_margin_top = 30.0
 texture_margin_right = 120.0
 texture_margin_bottom = 30.0
 modulate_color = Color(1.08, 1.08, 1.08, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_credit_btn"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 75.0
+texture_margin_top = 20.0
+texture_margin_right = 75.0
+texture_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_credit_btn_pressed"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 75.0
+texture_margin_top = 20.0
+texture_margin_right = 75.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.85, 0.85, 0.85, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_credit_btn_hover"]
+texture = ExtResource("4_button_tex")
+texture_margin_left = 75.0
+texture_margin_top = 20.0
+texture_margin_right = 75.0
+texture_margin_bottom = 20.0
+modulate_color = Color(1.08, 1.08, 1.08, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_credit_panel"]
+bg_color = Color(0.14, 0.18, 0.22, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.96, 0.55, 0.12, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 14
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_credit_slot"]
+content_margin_left = 30.0
+content_margin_top = 14.0
+content_margin_right = 30.0
+content_margin_bottom = 14.0
+bg_color = Color(0.0941176, 0.356863, 0.47451, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.35, 0.9)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Title" type="Control" unique_id=982053829]
 layout_mode = 3
@@ -119,3 +174,252 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_btn")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
 theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 text = "終了"
+
+[node name="CreditButton" type="Button" parent="." unique_id=1845678910]
+layout_mode = 1
+offset_left = 35.0
+offset_top = 30.0
+offset_right = 375.0
+offset_bottom = 125.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxTexture_credit_btn")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_credit_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxTexture_credit_btn_hover")
+text = "クレジット"
+
+[node name="CreditPopup" type="Control" parent="." unique_id=1845678911]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DarkOverlay" type="ColorRect" parent="CreditPopup" unique_id=1845678912]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="CreditPanel" type="Panel" parent="CreditPopup" unique_id=1845678913]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -350.0
+offset_right = 460.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_panel")
+
+[node name="HeaderLabel" type="Label" parent="CreditPopup/CreditPanel" unique_id=1845678914]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 30.0
+offset_right = 250.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 50
+text = "ク レ ジ ッ ト"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreditPopup/CreditPanel" unique_id=1845678915]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -200.0
+offset_right = 380.0
+offset_bottom = 185.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="PlannerBox" type="PanelContainer" parent="CreditPopup/CreditPanel/VBoxContainer" unique_id=1845678916]
+custom_minimum_size = Vector2(760, 105)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_slot")
+
+[node name="HBox" type="HBoxContainer" parent="CreditPopup/CreditPanel/VBoxContainer/PlannerBox" unique_id=1845678917]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="RoleLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/PlannerBox/HBox" unique_id=1845678918]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 34
+text = "プランナー"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/PlannerBox/HBox" unique_id=1845678919]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 40
+text = "名前を入力"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Programmer1Box" type="PanelContainer" parent="CreditPopup/CreditPanel/VBoxContainer" unique_id=1845678920]
+custom_minimum_size = Vector2(760, 105)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_slot")
+
+[node name="HBox" type="HBoxContainer" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer1Box" unique_id=1845678921]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="RoleLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer1Box/HBox" unique_id=1845678922]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 34
+text = "プログラマー"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer1Box/HBox" unique_id=1845678923]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 40
+text = "名前を入力"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Programmer2Box" type="PanelContainer" parent="CreditPopup/CreditPanel/VBoxContainer" unique_id=1845678924]
+custom_minimum_size = Vector2(760, 105)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_credit_slot")
+
+[node name="HBox" type="HBoxContainer" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer2Box" unique_id=1845678925]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="RoleLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer2Box/HBox" unique_id=1845678926]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 34
+text = "プログラマー"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="CreditPopup/CreditPanel/VBoxContainer/Programmer2Box/HBox" unique_id=1845678927]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 40
+text = "名前を入力"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CreditCloseButton" type="Button" parent="CreditPopup/CreditPanel" unique_id=1845678928]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -120.0
+offset_right = 170.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxTexture_credit_btn")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_credit_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxTexture_credit_btn_hover")
+text = "とじる"
+
+[node name="Playingboard" type="TextureRect" parent="." unique_id=1845678901]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_playingboard_tex")
+expand_mode = 1
+
+[node name="PlayStartButton" type="Button" parent="Playingboard" unique_id=1845678902]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -135.0
+offset_right = 380.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 14
+theme_override_fonts/font = ExtResource("1_y7k74")
+theme_override_font_sizes/font_size = 46
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+text = "セールスタート！！"

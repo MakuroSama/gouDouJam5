@@ -3,7 +3,7 @@ class_name HighScoreManager
 
 const SAVE_PATH: String = "user://records.json"
 
-# デフォルト記録データ
+# デフォルト記録データ（初期状態：0）
 static func get_default_records() -> Dictionary:
 	return {
 		"max_earned_amount": 0,
@@ -52,3 +52,9 @@ static func save_records(records: Dictionary) -> void:
 	if file:
 		file.store_string(JSON.stringify(records, "\t"))
 		file.close()
+
+# 記録のリセット（すべて0にして保存）
+static func reset_records() -> Dictionary:
+	var defaults = get_default_records()
+	save_records(defaults)
+	return defaults
