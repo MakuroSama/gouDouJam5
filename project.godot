@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 MusicPlayer="*res://MusicPlayer.gd"
 SfxPool="*res://SFXPool.gd"
+CursorManager="*res://CursorManager.gd"
 
 [display]
 
